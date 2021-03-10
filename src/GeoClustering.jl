@@ -1,5 +1,17 @@
 module GeoClustering
 
-# Write your package code here.
+using Meshes
+using Tables
+using Distances
+using Statistics
+using LinearAlgebra
+
+import Meshes: partition
+
+include("slic.jl")
+
+export
+  SLIC,
+  partition
 
 end
