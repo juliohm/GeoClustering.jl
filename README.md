@@ -6,7 +6,15 @@ Geostatistical clustering methods for the [GeoStats.jl](https://github.com/Julia
 
 ### SLIC
 
-TODO
+Simple Linear Iterative Clustering (SLIC) produces clusters
+that are spatially connected based on a geospatial distance `dₛ`.
+The samples in these clusters are similar in terms of their features
+according to a distance `dᵥ`. The tradeoff is controlled with a
+hyperparameter parameter `m` in an additive model `dₜ = √(dᵥ² + m²(dₛ/s)²)`.
+The original method developed for images is described in
+[Achanta et al. 2011](https://ieeexplore.ieee.org/document/6205760).
+It has been generalized in this package for any geospatial data set
+(e.g. point sets).
 
 ## Installation
 
