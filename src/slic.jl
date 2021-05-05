@@ -54,7 +54,7 @@ function partition(data, method::SLIC)
   c = slic_initialization(data, s)
 
   # ball neighborhood search
-  searcher = NeighborhoodSearch(data, NormBall(s))
+  searcher = BallSearch(data, NormBall(s))
 
   # pre-allocate memory for label and distance
   l = fill(0, nelements(data))
