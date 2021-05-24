@@ -39,26 +39,32 @@ SLIC(k::Int, m::Real; tol=1e-4, maxiter=10, vars=nothing) =
 
 function partition(data, method::SLIC)
   # variables used for clustering
-  datavars = name.(variables(data))
-  vars = isnothing(method.vars) ? datavars : method.vars
+  dvars = Tables.schema(values(data)).names
+  vars = isnothing(method.vars) ? dvars : method.vars
 
-  @assert vars ⊆ datavars "SLIC features not found in spatial data"
+  @assert vars ⊆ dvars "SLIC features not found in geospatial data"
+
+  # view subset of variables
+  ctable = Tables.columns(values(data))
+  cols   = [var => Tables.getcolumn(ctable, var) for var in vars]
+  ctor   = constructor(typeof(data))
+  Ω      = ctor(domain(data), (; cols...))
 
   # SLIC hyperparameter
   m = method.m
 
   # initial spacing of clusters
-  s = slic_spacing(data, method)
+  s = slic_spacing(Ω, method)
 
   # initialize cluster centers
-  c = slic_initialization(data, s)
+  c = slic_initialization(Ω, s)
 
   # ball neighborhood search
-  searcher = BallSearch(data, NormBall(s))
+  searcher = BallSearch(Ω, NormBall(s))
 
   # pre-allocate memory for label and distance
-  l = fill(0, nelements(data))
-  d = fill(Inf, nelements(data))
+  l = fill(0, nelements(Ω))
+  d = fill(Inf, nelements(Ω))
 
   # performance parameters
   tol     = method.tol
@@ -69,8 +75,8 @@ function partition(data, method::SLIC)
   while err > tol && iter < maxiter
     o = copy(c)
 
-    slic_assignment!(data, searcher, vars, m, s, c, l, d)
-    slic_update!(data, c, l)
+    slic_assignment!(Ω, searcher, m, s, c, l, d)
+    slic_update!(Ω, c, l)
 
     err = norm(c - o) / norm(o)
     iter += 1
@@ -81,19 +87,19 @@ function partition(data, method::SLIC)
   Partition(data, subsets)
 end
 
-function slic_spacing(data, method)
-  V = measure(boundingbox(data))
-  d = embeddim(data)
+function slic_spacing(Ω, method)
+  V = measure(boundingbox(Ω))
+  d = embeddim(Ω)
   k = method.k
   (V/k) ^ (1/d)
 end
 
-function slic_initialization(data, s)
+function slic_initialization(Ω, s)
   # efficient neighbor search
-  searcher = KNearestSearch(data, 1)
+  searcher = KNearestSearch(Ω, 1)
 
   # bounding box properties
-  bbox = boundingbox(data)
+  bbox = boundingbox(Ω)
   lo, up = coordinates.(extrema(bbox))
 
   # cluster centers
@@ -108,19 +114,19 @@ function slic_initialization(data, s)
   unique(clusters)
 end
 
-function slic_assignment!(data, searcher, vars, m, s, c, l, d)
+function slic_assignment!(Ω, searcher, m, s, c, l, d)
   for (k, cₖ) in enumerate(c)
-    pₖ = centroid(data, cₖ)
+    pₖ = centroid(Ω, cₖ)
     inds = search(pₖ, searcher)
 
     # distance between points
-    X  = (coordinates(centroid(data, ind)) for ind in inds)
+    X  = (coordinates(centroid(Ω, ind)) for ind in inds)
     xₖ = [coordinates(pₖ)]
     dₛ = pairwise(Euclidean(), X, xₖ)
 
     # distance between variables
-    𝒮ᵢ = view(data, inds, vars)
-    𝒮ₖ = view(data, [cₖ], vars)
+    𝒮ᵢ = view(Ω, inds)
+    𝒮ₖ = view(Ω, [cₖ])
     V  = Tables.matrix(values(𝒮ᵢ))
     vₖ = Tables.matrix(values(𝒮ₖ))
     dᵥ = pairwise(Euclidean(), V, vₖ, dims=1)
@@ -137,10 +143,10 @@ function slic_assignment!(data, searcher, vars, m, s, c, l, d)
   end
 end
 
-function slic_update!(data, c, l)
+function slic_update!(Ω, c, l)
   for k in 1:length(c)
     inds = findall(isequal(k), l)
-    X  = (coordinates(centroid(data, ind)) for ind in inds)
+    X  = (coordinates(centroid(Ω, ind)) for ind in inds)
     μ  = [mean(X)]
     dₛ = pairwise(Euclidean(), X, μ)
     @inbounds c[k] = inds[argmin(vec(dₛ))]
