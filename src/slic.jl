@@ -48,7 +48,10 @@ function partition(data, method::SLIC)
   ctable = Tables.columns(values(data))
   cols   = [var => Tables.getcolumn(ctable, var) for var in vars]
   ctor   = constructor(typeof(data))
-  Ω      = ctor(domain(data), (; cols...))
+  dom    = domain(data)
+  tab    = (; cols...)
+  dat    = Dict(paramdim(dom) => tab)
+  Ω      = ctor(dom, dat)
 
   # SLIC hyperparameter
   m = method.m
