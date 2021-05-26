@@ -6,6 +6,7 @@ module GeoClustering
 
 using Meshes
 using Tables
+using TableOperations
 using Distances
 using Statistics
 using LinearAlgebra

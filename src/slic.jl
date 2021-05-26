@@ -45,13 +45,10 @@ function partition(data, method::SLIC)
   @assert vars ⊆ dvars "SLIC features not found in geospatial data"
 
   # view subset of variables
-  ctable = Tables.columns(values(data))
-  cols   = [var => Tables.getcolumn(ctable, var) for var in vars]
-  ctor   = constructor(typeof(data))
-  dom    = domain(data)
-  tab    = (; cols...)
-  dat    = Dict(paramdim(dom) => tab)
-  Ω      = ctor(dom, dat)
+  ctor = constructor(typeof(data))
+  dom  = domain(data)
+  tab  = TableOperations.select(values(data), vars...)
+  Ω    = ctor(dom, Dict(paramdim(dom) => tab))
 
   # SLIC hyperparameter
   m = method.m
