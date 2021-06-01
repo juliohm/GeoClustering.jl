@@ -7,7 +7,7 @@
     GHC(kernel,merge_crit;k=35,vars=nothing)
 
 A method for partitioning spatial data into `k` clusters 
-using Hierarchical Clustering (HC). This method generates
+using Geostatistical Hierarchical Clustering (GHC). This method generates
 clusters by assigning a unique cluster to each datum, 
 iteratively joining the two clusters which are most similar
 according to a kernel estimator on the data's spatial 
@@ -113,4 +113,3 @@ struct partition_info
     C::Vector{Int} #assigns each datum to cluster
     S::Float64
 end
-
