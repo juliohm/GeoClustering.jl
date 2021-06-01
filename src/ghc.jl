@@ -24,7 +24,8 @@ where the clusters' silhouette index is optimized.
 * `vars`        - Variables (or features) to consider (default to all)
 
 ## References
-F. Fouedjio. 2016. [A hierarchical clustering method for multivariate geostatistical data](https://www.sciencedirect.com/user/identity/landing?code=P9dijrR5ldFB4coqi0yQHgLfQ5MFYxawsG4FDx5P&state=retryCounter%3D0%26csrfToken%3D4759c62b-4aaa-4655-8a6a-5472bce660e6%26idpPolicy%3Durn%253Acom%253Aelsevier%253Aidp%253Apolicy%253Aproduct%253Ainst_assoc%26returnUrl%3D%252Fscience%252Farticle%252Fpii%252FS2211675316300367%26prompt%3Dnone%26cid%3Darp-8529a2eb-812b-4181-9ac0-a74a362bbc6e)
+* F. Fouedjio. 2016. [A hierarchical clustering method for multivariate geostatistical data]
+  (https://www.sciencedirect.com/science/article/abs/pii/S2211675316300367)
 """
 struct GHC <: PartitionMethod
   variogram::V
@@ -112,5 +113,4 @@ struct partition_info
     C::Vector{Int} #assigns each datum to cluster
     S::Float64
 end
-
 
