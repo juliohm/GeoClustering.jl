@@ -2,7 +2,6 @@
 # Licensed under the MIT License. See LICENSE in the project root.
 # ------------------------------------------------------------------
 
-
 """
     GHC(kernel,merge_crit;k=35,vars=nothing)
 
