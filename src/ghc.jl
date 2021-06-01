@@ -1,21 +1,39 @@
+# ------------------------------------------------------------------
+# Licensed under the MIT License. See LICENSE in the project root.
+# ------------------------------------------------------------------
+
+
 """
-    GHC(k, variogram)
+    GHC(kernel,merge_crit;k=35,vars=nothing)
 
-Geostatistical Hierarchical Clustering.
+A method for partitioning spatial data into `k` clusters 
+using Hierarchical Clustering (HC). This method generates
+clusters by assigning a unique cluster to each datum, 
+iteratively joining the two clusters which are most similar
+according to a kernel estimator on the data's spatial 
+dependence, and finally stopping this process at the step 
+where the clusters' silhouette index is optimized.
 
-Long description....
+## Parameters
+
+* `kernel`      - type of kernel used for estimator
+* `merge_crit`  - strategy to specify difference between clusters
+* `k`           - minimum number of observations contained in support 
+                    of kernel function centered at each point. 
+                    Defaults to 35.
+* `vars`        - Variables (or features) to consider (default to all)
 
 ## References
-...
+F. Fouedjio. 2016. [A hierarchical clustering method for multivariate geostatistical data](https://www.sciencedirect.com/user/identity/landing?code=P9dijrR5ldFB4coqi0yQHgLfQ5MFYxawsG4FDx5P&state=retryCounter%3D0%26csrfToken%3D4759c62b-4aaa-4655-8a6a-5472bce660e6%26idpPolicy%3Durn%253Acom%253Aelsevier%253Aidp%253Apolicy%253Aproduct%253Ainst_assoc%26returnUrl%3D%252Fscience%252Farticle%252Fpii%252FS2211675316300367%26prompt%3Dnone%26cid%3Darp-8529a2eb-812b-4181-9ac0-a74a362bbc6e)
 """
 struct GHC <: PartitionMethod
   variogram::V
   k::Int
 end
 
-function partition(data::Data, method::GHC,kernel_type,merge_criterion)
+function partition(data::Data, method::GHC,kernel,merge_crit)
   # find lambda
-  𝛌 = choose_𝛌(data,35) #literature rule of thumb
+  λ = choose_λ(data,35) #literature rule of thumb
   # initialize history to store cluster/S(q) data
   n = length(data) #number of points
   h = Array{partition_info, 1}(undef, n)
@@ -23,7 +41,7 @@ function partition(data::Data, method::GHC,kernel_type,merge_criterion)
   d = zeros(n,n)#trivial placeholder for d
   for q in 1:n
     # find cluster partition C
-    C = merge_clusters(data,C,d,"avg")
+    C = merge_clusters(data,C,d,merge_criterion)
     # compute S(q)
     S = compute_silhouette(h,q,C)
     # store info (C,S) in history
@@ -34,25 +52,25 @@ function partition(data::Data, method::GHC,kernel_type,merge_criterion)
   return best_C
 end
 
-function ghc_kernel(𝛌,x,s,type)
+function ghc_kernel(λ,x,s,type)
     #uniform
     #triangular
     #Epanechnikov
     #Gaussian
 end
 
-function kernel_estimator(x,y,𝛌,type) 
+function kernel_estimator(x,y,λ,type) 
     #equation 1
 end
 
-function dissimilarity(s_k,s_l,𝛌)
+function dissimilarity(sₖ,sₗ,λ)
     #equation 2
 end
 
 function find_d()
     #equation 3, first pass
 end
-function update_d(data,C,C_new,d,merge_criterion) #compute dissimilarity matrix
+function update_d(data,C,C',d,merge_criterion) #compute dissimilarity matrix
     #equation 3 modified by linkage rule
     #only update d for changed i,⋅ or ⋅,i where i is one of the two merged clusters
     #single linkage
@@ -73,11 +91,11 @@ function merge_clusters(data,C,d,merge_criterion) #join most similar clusters
     end
     C_new = update_C(data,C,d)
     #recompute d matrix
-    d = update_d(data,C,C_new,d,merge_criterion)
-    return C_new,d
+    d = update_d(data,C,C',d,merge_criterion)
+    return C',d
 end
 
-function choose_𝛌(data,k)
+function choose_λ(data,k)
     #find maximum distance of kth neighbor
 end
 
