@@ -131,21 +131,3 @@ function find_d(data,λ,kernel)
     end
     return d_mat ./ max(d_mat) #normalized
 end
-
-
-
-
-
-
-<<<<<<< HEAD
-
-
-
-
-=======
-#for storing history
-struct partition_info
-    C::Vector{Int} #assigns each datum to cluster
-    S::Float64
-end
->>>>>>> 9f7635dd2d0bc6bffa1bca1c2de2b702f96d65f9
