@@ -13,10 +13,11 @@ using LinearAlgebra
 
 import Meshes: partition
 
-include("slic.jl")
+include("clustering.jl")
 
 export
   SLIC,
-  partition
+  partition,
+  cluster
 
 end

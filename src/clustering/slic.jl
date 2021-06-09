@@ -5,7 +5,7 @@
 """
     SLIC(k, m; tol=1e-4, maxiter=10, vars=nothing)
 
-A method for partitioning spatial data into approximately `k`
+A method for clustering geospatial data into approximately `k`
 clusters using Simple Linear Iterative Clustering (SLIC).
 The method produces clusters of samples that are spatially
 connected based on a distance `dₛ` and that, at the same
@@ -26,7 +26,7 @@ The tradeoff is controlled with a hyperparameter parameter
 * Achanta et al. 2011. [SLIC superpixels compared to state-of-the-art
   superpixel methods](https://ieeexplore.ieee.org/document/6205760)
 """
-struct SLIC <: PartitionMethod
+struct SLIC <: ClusteringMethod
   k::Int
   m::Float64
   tol::Float64
