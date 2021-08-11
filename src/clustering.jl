@@ -25,7 +25,7 @@ function cluster(data::Data, method::ClusteringMethod)
 
   # assign cluster labels to samples
   labels = Vector{Int}(undef, nelements(d))
-  for (l, inds) in enumerate(subsets(p))
+  for (l, inds) in enumerate(indices(p))
     labels[inds] .= l
   end
 
