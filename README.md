@@ -16,6 +16,13 @@ The original method developed for images is described in
 It has been generalized in this package for any geospatial data set
 (e.g. point sets).
 
+### GHC
+
+Geostatistical Hierarchical Clustering (GHC) produces clusters
+based on (cross-)variograms between covariates and on a kernel
+function between geospatial coordinates. The method is described
+in [Fouedjio, F. 2016](https://www.sciencedirect.com/science/article/abs/pii/S2211675316300367).
+
 ## Installation
 
 Get the latest stable release with Julia's package manager:
