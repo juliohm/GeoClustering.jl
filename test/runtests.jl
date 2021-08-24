@@ -15,7 +15,8 @@ datadir = joinpath(@__DIR__,"data")
 
 # list of tests
 testfiles = [
-  "slic.jl"
+  "slic.jl",
+  "ghc.jl"
 ]
 
 @testset "GeoClustering.jl" begin
