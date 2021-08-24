@@ -8,8 +8,10 @@ using Meshes
 using Tables
 using TableOperations
 using Distances
+using Clustering
 using Statistics
 using LinearAlgebra
+using SparseArrays
 
 import Meshes: partition
 
@@ -17,6 +19,7 @@ include("clustering.jl")
 
 export
   SLIC,
+  GHC,
   partition,
   cluster
 

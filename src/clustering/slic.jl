@@ -40,8 +40,7 @@ SLIC(k::Int, m::Real; tol=1e-4, maxiter=10, vars=nothing) =
 function partition(data, method::SLIC)
   # variables used for clustering
   dvars = Tables.schema(values(data)).names
-  vars = isnothing(method.vars) ? dvars : method.vars
-
+  vars  = isnothing(method.vars) ? dvars : method.vars
   @assert vars ⊆ dvars "SLIC features not found in geospatial data"
 
   # view subset of variables
