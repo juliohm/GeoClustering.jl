@@ -16,7 +16,9 @@ kernfun = Dict(
     GHC(k, λ; kern=:epanechnikov, link=:ward, vars=nothing)
 
 A method for partitioning spatial data into `k` clusters 
-using Geostatistical Hierarchical Clustering (GHC).
+according to a range `λ` using Geostatistical Hierarchical
+Clustering (GHC). The larger the range the more connected
+are nearby samples.
 
 ## Parameters
 
@@ -30,6 +32,16 @@ using Geostatistical Hierarchical Clustering (GHC).
 
 * Fouedjio, F. 2016. [A hierarchical clustering method for multivariate geostatistical data]
   (https://www.sciencedirect.com/science/article/abs/pii/S2211675316300367)
+
+### Notes
+
+- The range parameter controls the sparsity pattern of the pairwise
+  distances, which can greatly affect the computational performance
+  of the GHC algorithm. We recommend choosing a range that is small
+  enough to connect nearby samples. For example, clustering data over
+  a 100x100 Cartesian grid with unit spacing is possible with `λ=1.0`
+  or `λ=2.0` but the problem starts to become computationally unfeasible
+  around `λ=10.0` due to the density of points.
 """
 struct GHC <: ClusteringMethod
   k::Int
