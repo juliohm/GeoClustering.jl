@@ -119,7 +119,7 @@ function ghc_kernel_matrix(kern, λ, 𝒟)
   Kλ(h) = fn(h, λ=λ)
 
   # collect coordinates
-  coords = coordinates.(centroid.(𝒟))
+  coords = [coordinates(centroid(𝒟, i)) for i in 1:nelements(𝒟)]
 
   # lag matrix
   H = pairwise(Euclidean(), coords)

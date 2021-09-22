@@ -11,8 +11,13 @@
   @test mean(coordinates(centroid(p2, ind)) for ind in 1:nelements(p2)) == [15.0,5.0]
   @test mean(coordinates(centroid(p3, ind)) for ind in 1:nelements(p3)) == [5.0,15.0]
   @test mean(coordinates(centroid(p4, ind)) for ind in 1:nelements(p4)) == [15.0,15.0]
+
   C = cluster(𝒮, GHC(4, 1.0))
   @test C.cluster == vec(Z')
+
+  𝒮′ = georef(values(𝒮), centroid.(domain(𝒮)))
+  C′ = cluster(𝒮′, GHC(4, 1.0))
+  @test C.cluster == C′.cluster
 
   𝒮 = georef((z=[√(i^2+j^2) for i in 1:50, j in 1:50],))
   p = partition(𝒮, GHC(50, 1.0))
