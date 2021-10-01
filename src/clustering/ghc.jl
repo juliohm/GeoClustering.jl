@@ -13,7 +13,7 @@ kernfun = Dict(
 )
 
 """
-    GHC(k, λ; kern=:epanechnikov, link=:ward, vars=nothing)
+    GHC(k, λ; kern=:epanechnikov, link=:ward)
 
 A method for partitioning spatial data into `k` clusters 
 according to a range `λ` using Geostatistical Hierarchical
@@ -26,7 +26,6 @@ are nearby samples.
 * `λ`    - Approximate range of kernel function
 * `kern` - Kernel function (`:uniform`, `:triangular` or `:epanechnikov`)
 * `link` - Linkage function (`:single`, `:average`, `:complete`, `:ward` or `:ward_presquared`)
-* `vars` - Variables (or features) to consider (default to all)
 
 ## References
 
@@ -48,30 +47,18 @@ struct GHC <: ClusteringMethod
   λ::Float64
   kern::Symbol
   link::Symbol
-  vars::Union{Vector{Symbol},Nothing}
 end
 
-function GHC(k, λ; kern=:epanechnikov, link=:ward, vars=nothing)
+function GHC(k, λ; kern=:epanechnikov, link=:ward)
   # sanity checks
   @assert k > 0 "invalid number of clusters"
   @assert λ > 0 "invalid kernel range"
   @assert kern ∈ [:uniform,:triangular,:epanechnikov] "invalid kernel function"
   @assert link ∈ [:single,:average,:complete,:ward,:ward_presquared] "invalid linkage function"
-  GHC(k, λ, kern, link, vars)
+  GHC(k, λ, kern, link)
 end
 
 function partition(data, method::GHC)
-  # variables used for clustering
-  dvars = Tables.schema(values(data)).names
-  vars  = isnothing(method.vars) ? dvars : method.vars
-  @assert vars ⊆ dvars "GHC features not found in geospatial data"
-
-  # view subset of variables
-  ctor = constructor(typeof(data))
-  dom  = domain(data)
-  tab  = TableOperations.select(values(data), vars...)
-  Ω    = ctor(dom, Dict(paramdim(dom) => tab))
-
   # GHC parameters
   k    = method.k
   λ    = method.λ
@@ -79,7 +66,7 @@ function partition(data, method::GHC)
   link = method.link
 
   # dissimilarity matrix
-  D = ghc_dissimilarity_matrix(Ω, kern, λ)
+  D = ghc_dissimilarity_matrix(data, kern, λ)
 
   # classical hierarchical clustering
   tree = hclust(D, linkage=link)
@@ -98,10 +85,10 @@ function partition(data, method::GHC)
   Partition(data, subsets)
 end
 
-function ghc_dissimilarity_matrix(Ω, kern, λ)
+function ghc_dissimilarity_matrix(data, kern, λ)
   # retrive domain/table
-  𝒟 = domain(Ω)
-  𝒯 = values(Ω)
+  𝒟 = domain(data)
+  𝒯 = values(data)
 
   # kernel matrix
   K = ghc_kernel_matrix(kern, λ, 𝒟)

@@ -3,7 +3,7 @@
 # ------------------------------------------------------------------
 
 """
-    SLIC(k, m; tol=1e-4, maxiter=10, vars=nothing)
+    SLIC(k, m; tol=1e-4, maxiter=10)
 
 A method for clustering geospatial data into approximately `k`
 clusters using Simple Linear Iterative Clustering (SLIC).
@@ -19,7 +19,6 @@ The tradeoff is controlled with a hyperparameter parameter
 * `m`       - Hyperparameter of SLIC model
 * `tol`     - Tolerance of k-means algorithm (default to `1e-4`)
 * `maxiter` - Maximum number of iterations (default to `10`)
-* `vars`    - Variables (or features) to consider (default to all)
 
 ## References
 
@@ -31,39 +30,30 @@ struct SLIC <: ClusteringMethod
   m::Float64
   tol::Float64
   maxiter::Int
-  vars::Union{Vector{Symbol},Nothing}
 end
 
-SLIC(k::Int, m::Real; tol=1e-4, maxiter=10, vars=nothing) =
-  SLIC(k, m, tol, maxiter, vars)
+function SLIC(k::Int, m::Real; tol=1e-4, maxiter=10)
+  @assert tol > 0 "invalid tolerance"
+  @assert maxiter > 0 "invalid number of iterations"
+  SLIC(k, m, tol, maxiter)
+end
 
 function partition(data, method::SLIC)
-  # variables used for clustering
-  dvars = Tables.schema(values(data)).names
-  vars  = isnothing(method.vars) ? dvars : method.vars
-  @assert vars ⊆ dvars "SLIC features not found in geospatial data"
-
-  # view subset of variables
-  ctor = constructor(typeof(data))
-  dom  = domain(data)
-  tab  = TableOperations.select(values(data), vars...)
-  Ω    = ctor(dom, Dict(paramdim(dom) => tab))
-
   # SLIC hyperparameter
   m = method.m
 
   # initial spacing of clusters
-  s = slic_spacing(Ω, method)
+  s = slic_spacing(data, method)
 
   # initialize cluster centers
-  c = slic_initialization(Ω, s)
+  c = slic_initialization(data, s)
 
   # ball neighborhood search
-  searcher = BallSearch(Ω, NormBall(s))
+  searcher = BallSearch(data, NormBall(s))
 
   # pre-allocate memory for label and distance
-  l = fill(0, nelements(Ω))
-  d = fill(Inf, nelements(Ω))
+  l = fill(0, nelements(data))
+  d = fill(Inf, nelements(data))
 
   # performance parameters
   tol     = method.tol
@@ -74,8 +64,8 @@ function partition(data, method::SLIC)
   while err > tol && iter < maxiter
     o = copy(c)
 
-    slic_assignment!(Ω, searcher, m, s, c, l, d)
-    slic_update!(Ω, c, l)
+    slic_assignment!(data, searcher, m, s, c, l, d)
+    slic_update!(data, c, l)
 
     err = norm(c - o) / norm(o)
     iter += 1
@@ -86,19 +76,19 @@ function partition(data, method::SLIC)
   Partition(data, subsets)
 end
 
-function slic_spacing(Ω, method)
-  V = measure(boundingbox(Ω))
-  d = embeddim(Ω)
+function slic_spacing(data, method)
+  V = measure(boundingbox(data))
+  d = embeddim(data)
   k = method.k
   (V/k) ^ (1/d)
 end
 
-function slic_initialization(Ω, s)
+function slic_initialization(data, s)
   # efficient neighbor search
-  searcher = KNearestSearch(Ω, 1)
+  searcher = KNearestSearch(data, 1)
 
   # bounding box properties
-  bbox = boundingbox(Ω)
+  bbox = boundingbox(data)
   lo, up = coordinates.(extrema(bbox))
 
   # cluster centers
@@ -113,19 +103,19 @@ function slic_initialization(Ω, s)
   unique(clusters)
 end
 
-function slic_assignment!(Ω, searcher, m, s, c, l, d)
+function slic_assignment!(data, searcher, m, s, c, l, d)
   for (k, cₖ) in enumerate(c)
-    pₖ = centroid(Ω, cₖ)
+    pₖ = centroid(data, cₖ)
     inds = search(pₖ, searcher)
 
     # distance between points
-    X  = (coordinates(centroid(Ω, ind)) for ind in inds)
+    X  = (coordinates(centroid(data, ind)) for ind in inds)
     xₖ = [coordinates(pₖ)]
     dₛ = pairwise(Euclidean(), X, xₖ)
 
     # distance between variables
-    𝒮ᵢ = view(Ω, inds)
-    𝒮ₖ = view(Ω, [cₖ])
+    𝒮ᵢ = view(data, inds)
+    𝒮ₖ = view(data, [cₖ])
     V  = Tables.matrix(values(𝒮ᵢ))
     vₖ = Tables.matrix(values(𝒮ₖ))
     dᵥ = pairwise(Euclidean(), V, vₖ, dims=1)
@@ -142,10 +132,10 @@ function slic_assignment!(Ω, searcher, m, s, c, l, d)
   end
 end
 
-function slic_update!(Ω, c, l)
+function slic_update!(data, c, l)
   for k in 1:length(c)
     inds = findall(isequal(k), l)
-    X  = (coordinates(centroid(Ω, ind)) for ind in inds)
+    X  = (coordinates(centroid(data, ind)) for ind in inds)
     μ  = [mean(X)]
     dₛ = pairwise(Euclidean(), X, μ)
     @inbounds c[k] = inds[argmin(vec(dₛ))]

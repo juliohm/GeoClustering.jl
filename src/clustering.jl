@@ -14,12 +14,36 @@ data besides the underlying geospatial domain.
 abstract type ClusteringMethod <: Meshes.PartitionMethod end
 
 """
-    cluster(data, method)
+    cluster(data, method; vars=[all])
 
 Cluster geospatial `data` with clustering `method`
-and return geospatial data with cluster labels.
+using variables `vars` and return geospatial data
+with cluster labels. Use all variables by default.
+
+    cluster(data, model; vars=[all])
+
+Alternatively, cluster geospatial `data` with
+[`MLJ`](https://github.com/alan-turing-institute/MLJ.jl)
+model.
 """
-function cluster(data::Data, method::ClusteringMethod)
+function cluster(data::Data, method; vars=nothing)
+  # retrieve data
+  tab = values(data)
+  dom = domain(data)
+
+  # variables used for clustering
+  dvars = Tables.schema(tab).names
+  vars  = isnothing(vars) ? dvars : vars
+  @assert vars ⊆ dvars "variables not found in geospatial data"
+
+  # view subset of variables
+  sel = TableOperations.select(tab, vars...)
+
+  # perform clustering on selection
+  _cluster(georef(sel, dom), method)
+end
+
+function _cluster(data::Data, method::ClusteringMethod)
   d = domain(data)
   p = partition(data, method)
 
@@ -35,14 +59,7 @@ function cluster(data::Data, method::ClusteringMethod)
   georef(t, d)
 end
 
-"""
-    cluster(data, model)
-
-Cluster geospatial `data` with model implementing the
-[`MLJ`](https://github.com/alan-turing-institute/MLJ.jl)
-interface.
-"""
-function cluster(data::Data, model::MI.Model)
+function _cluster(data::Data, model::MI.Model)
   # perform clustering
   table = values(data)
   θ, _, __ = MI.fit(model, 0, table)
