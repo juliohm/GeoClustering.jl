@@ -1,6 +1,7 @@
 using GeoClustering
 using Meshes
 using GeoStatsBase
+using MLJ: @load
 using Test, Random, Plots
 using ReferenceTests, ImageIO
 
@@ -15,6 +16,7 @@ datadir = joinpath(@__DIR__,"data")
 
 # list of tests
 testfiles = [
+  "mlj.jl",
   "slic.jl",
   "ghc.jl"
 ]

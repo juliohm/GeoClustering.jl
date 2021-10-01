@@ -1,6 +1,4 @@
 @testset "GHC" begin
-  setify(lists) = Set(Set.(lists))
-
   Z = [ones(10,10) 2ones(10,10); 3ones(10,10) 4ones(10,10)]
   𝒮 = georef((Z=Z,))
   p = partition(𝒮, GHC(4, 1.0))

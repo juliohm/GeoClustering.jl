@@ -32,8 +32,29 @@ function cluster(data::Data, method::ClusteringMethod)
   # table with cluster labels
   t = (cluster = labels,)
 
-  ctor = constructor(typeof(data))
-  ctor(d, Dict(paramdim(d) => t))
+  georef(t, d)
+end
+
+"""
+    cluster(data, model)
+
+Cluster geospatial `data` with model implementing the
+[`MLJ`](https://github.com/alan-turing-institute/MLJ.jl)
+interface.
+"""
+function cluster(data::Data, model::MI.Model)
+  # perform clustering
+  table = values(data)
+  θ, _, __ = MI.fit(model, 0, table)
+  labels = MI.predict(model, θ, table)
+
+  # table with cluster labels
+  t = (cluster = unwrap.(labels),)
+
+  # underlying geospatial domain
+  d = domain(data)
+
+  georef(t, d)
 end
 
 # ----------------
