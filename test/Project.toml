@@ -1,4 +1,5 @@
 [deps]
+BetaML = "024491cd-cc6b-443e-8034-08ea7eb7db2b"
 GeoStatsBase = "323cb8eb-fbf6-51c0-afd0-f8fba70507b2"
 ImageIO = "82e4d734-157c-48bb-816b-45c225c6df19"
 MLJ = "add582a8-e3ab-11e8-2d5e-e98b27df1bc7"

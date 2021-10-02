@@ -1,6 +1,4 @@
 @testset "SLIC" begin
-  setify(lists) = Set(Set.(lists))
-
   Z = [ones(10,10) 2ones(10,10); 3ones(10,10) 4ones(10,10)]
   𝒮 = georef((Z=Z,))
   p = partition(𝒮, SLIC(4, 1.0))
@@ -11,6 +9,7 @@
   @test mean(coordinates(centroid(p2, ind)) for ind in 1:nelements(p2)) == [15.0,5.0]
   @test mean(coordinates(centroid(p3, ind)) for ind in 1:nelements(p3)) == [5.0,15.0]
   @test mean(coordinates(centroid(p4, ind)) for ind in 1:nelements(p4)) == [15.0,15.0]
+
   C = cluster(𝒮, SLIC(4, 1.0))
   @test C.cluster == vec(Z')
 

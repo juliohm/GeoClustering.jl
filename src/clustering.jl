@@ -54,7 +54,7 @@ function _cluster(data::Data, method::ClusteringMethod)
   end
 
   # table with cluster labels
-  t = (cluster = labels,)
+  t = (cluster=categorical(labels),)
 
   georef(t, d)
 end
@@ -65,13 +65,9 @@ function _cluster(data::Data, model::MI.Model)
   θ, _, __ = MI.fit(model, 0, table)
   labels = MI.predict(model, θ, table)
 
-  # table with cluster labels
-  t = (cluster = unwrap.(labels),)
+  cluster = isprobabilistic(model) ? mode.(labels) : labels
 
-  # underlying geospatial domain
-  d = domain(data)
-
-  georef(t, d)
+  georef((cluster=cluster,), domain(data))
 end
 
 # ----------------
