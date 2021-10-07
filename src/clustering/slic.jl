@@ -40,8 +40,8 @@ end
 
 function partition(data, method::SLIC)
   # normalize coordinates and atributes only once
-  newtable = TableDistances.normalize(values(data))
-  data = georef(first(newtable), domain(data))
+  𝒯 = TableDistances.normalize(values(data))
+  Ω = georef(first(𝒯), domain(data))
 
   # SLIC hyperparameter
   m = method.m
