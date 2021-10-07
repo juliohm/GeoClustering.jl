@@ -39,6 +39,10 @@ function SLIC(k::Int, m::Real; tol=1e-4, maxiter=10)
 end
 
 function partition(data, method::SLIC)
+  # normalize coordinates and atributes only once
+  newtable = TableDistances.normalize(values(data))
+  data = georef(first(newtable), domain(data))
+
   # SLIC hyperparameter
   m = method.m
 
@@ -118,7 +122,7 @@ function slic_assignment!(data, searcher, m, s, c, l, d)
     𝒮ₖ = view(data, [cₖ])
     V  = values(𝒮ᵢ)
     vₖ = values(𝒮ₖ)
-    dᵥ = pairwise(TableDistance(), V, vₖ)
+    dᵥ = pairwise(TableDistance(normalize=false), V, vₖ)
 
     # total distance
     dₜ = @. √(dᵥ^2 + m^2 * (dₛ/s)^2)
