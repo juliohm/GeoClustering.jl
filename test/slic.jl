@@ -22,7 +22,7 @@
   end
 
   # test SLIC with heterogenous data
-  Z = (x=rand(10), y=rand(10), a=rand(10), b=[i for i in 1:10],)
+  Z = (a=rand(10), b=1:10, x=rand(10), y=rand(10))
   𝒮 = georef(Z, (:x, :y))
   C = cluster(𝒮, SLIC(2, 1.0))
   @test domain(C) == domain(𝒮)
