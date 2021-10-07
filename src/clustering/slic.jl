@@ -39,7 +39,7 @@ function SLIC(k::Int, m::Real; tol=1e-4, maxiter=10)
 end
 
 function partition(data, method::SLIC)
-  # normalize coordinates and atributes only once
+  # normalize atributes
   𝒯 = TableDistances.normalize(values(data))
   Ω = georef(first(𝒯), domain(data))
 
