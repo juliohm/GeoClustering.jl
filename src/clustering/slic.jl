@@ -47,17 +47,17 @@ function partition(data, method::SLIC)
   m = method.m
 
   # initial spacing of clusters
-  s = slic_spacing(data, method)
+  s = slic_spacing(Ω, method)
 
   # initialize cluster centers
-  c = slic_initialization(data, s)
+  c = slic_initialization(Ω, s)
 
   # ball neighborhood search
-  searcher = BallSearch(data, NormBall(s))
+  searcher = BallSearch(Ω, NormBall(s))
 
   # pre-allocate memory for label and distance
-  l = fill(0, nelements(data))
-  d = fill(Inf, nelements(data))
+  l = fill(0, nelements(Ω))
+  d = fill(Inf, nelements(Ω))
 
   # performance parameters
   tol     = method.tol
@@ -68,8 +68,8 @@ function partition(data, method::SLIC)
   while err > tol && iter < maxiter
     o = copy(c)
 
-    slic_assignment!(data, searcher, m, s, c, l, d)
-    slic_update!(data, c, l)
+    slic_assignment!(Ω, searcher, m, s, c, l, d)
+    slic_update!(Ω, c, l)
 
     err = norm(c - o) / norm(o)
     iter += 1
