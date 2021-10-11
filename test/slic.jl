@@ -26,5 +26,4 @@
   𝒮 = georef(Z, (:x, :y))
   C = cluster(𝒮, SLIC(2, 1.0))
   @test domain(C) == domain(𝒮)
-  @test Set(unique(C.cluster)) == Set([1,2])
 end
