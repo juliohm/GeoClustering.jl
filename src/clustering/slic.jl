@@ -76,7 +76,7 @@ function partition(data, method::SLIC)
   end
 
   if method.fillorphan
-    inds      = findall(isequal(0), l)
+    inds      = findall(iszero, l)
     orphans   = [coordinates(domain(Ω)[i]) for i in inds]
     centroids = [coordinates(centroid(Ω, cₖ)) for cₖ in c]
 
