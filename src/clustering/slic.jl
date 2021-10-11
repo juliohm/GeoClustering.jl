@@ -30,12 +30,13 @@ struct SLIC <: ClusteringMethod
   m::Float64
   tol::Float64
   maxiter::Int
+  fillorphan::Bool
 end
 
-function SLIC(k::Int, m::Real; tol=1e-4, maxiter=10)
+function SLIC(k::Int, m::Real; tol=1e-4, maxiter=10, fillorphan=true)
   @assert tol > 0 "invalid tolerance"
   @assert maxiter > 0 "invalid number of iterations"
-  SLIC(k, m, tol, maxiter)
+  SLIC(k, m, tol, maxiter, fillorphan)
 end
 
 function partition(data, method::SLIC)
@@ -73,6 +74,18 @@ function partition(data, method::SLIC)
 
     err = norm(c - o) / norm(o)
     iter += 1
+  end
+
+  if method.fillorphan
+    inds      = findall(isequal(0), l)
+    orphans   = [coordinates(domain(Ω)[i]) for i in inds]
+    centroids = [coordinates(centroid(Ω, cₖ)) for cₖ in c]
+
+    for (i, orphan) in zip(inds, orphans)
+      dc   = pairwise(Euclidean(), centroids, [orphan])
+      k    = argmin(dc)[1]
+      l[i] = k
+    end
   end
 
   subsets = [findall(isequal(k), l) for k in 1:length(c)]
