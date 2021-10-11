@@ -30,7 +30,6 @@ struct SLIC <: ClusteringMethod
   m::Float64
   tol::Float64
   maxiter::Int
-  fillorphan::Bool
 end
 
 function SLIC(k::Int, m::Real; tol=1e-4, maxiter=10, fillorphan=true)
