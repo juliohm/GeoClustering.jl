@@ -20,4 +20,10 @@
   if visualtests
     @test_reference "data/slic.png" plot(p)
   end
+
+  # test SLIC with heterogeneous data
+  Z = (a=rand(10), b=1:10, x=rand(10), y=rand(10))
+  𝒮 = georef(Z, (:x, :y))
+  C = cluster(𝒮, SLIC(2, 1.0))
+  @test domain(C) == domain(𝒮)
 end

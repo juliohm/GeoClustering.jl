@@ -8,6 +8,7 @@ using Meshes
 using GeoStatsBase
 
 using Tables
+using TableDistances
 using TableOperations
 using CategoricalArrays
 using Distances

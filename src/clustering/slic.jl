@@ -39,21 +39,25 @@ function SLIC(k::Int, m::Real; tol=1e-4, maxiter=10)
 end
 
 function partition(data, method::SLIC)
+  # normalize atributes
+  𝒯 = TableDistances.normalize(values(data))
+  Ω = georef(first(𝒯), domain(data))
+
   # SLIC hyperparameter
   m = method.m
 
   # initial spacing of clusters
-  s = slic_spacing(data, method)
+  s = slic_spacing(Ω, method)
 
   # initialize cluster centers
-  c = slic_initialization(data, s)
+  c = slic_initialization(Ω, s)
 
   # ball neighborhood search
-  searcher = BallSearch(data, NormBall(s))
+  searcher = BallSearch(Ω, NormBall(s))
 
   # pre-allocate memory for label and distance
-  l = fill(0, nelements(data))
-  d = fill(Inf, nelements(data))
+  l = fill(0, nelements(Ω))
+  d = fill(Inf, nelements(Ω))
 
   # performance parameters
   tol     = method.tol
@@ -64,8 +68,8 @@ function partition(data, method::SLIC)
   while err > tol && iter < maxiter
     o = copy(c)
 
-    slic_assignment!(data, searcher, m, s, c, l, d)
-    slic_update!(data, c, l)
+    slic_assignment!(Ω, searcher, m, s, c, l, d)
+    slic_update!(Ω, c, l)
 
     err = norm(c - o) / norm(o)
     iter += 1
@@ -116,9 +120,9 @@ function slic_assignment!(data, searcher, m, s, c, l, d)
     # distance between variables
     𝒮ᵢ = view(data, inds)
     𝒮ₖ = view(data, [cₖ])
-    V  = Tables.matrix(values(𝒮ᵢ))
-    vₖ = Tables.matrix(values(𝒮ₖ))
-    dᵥ = pairwise(Euclidean(), V, vₖ, dims=1)
+    V  = values(𝒮ᵢ)
+    vₖ = values(𝒮ₖ)
+    dᵥ = pairwise(TableDistance(normalize=false), V, vₖ)
 
     # total distance
     dₜ = @. √(dᵥ^2 + m^2 * (dₛ/s)^2)
