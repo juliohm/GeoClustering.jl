@@ -14,7 +14,7 @@
   @test C.cluster == vec(Z')
 
   𝒮 = georef((z=[√(i^2+j^2) for i in 1:100, j in 1:100],))
-  p = partition(𝒮, SLIC(50, 1.0))
+  p = partition(𝒮, SLIC(50, 0.001))
   @test length(p) == 49
 
   if visualtests
