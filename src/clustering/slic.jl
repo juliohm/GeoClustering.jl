@@ -35,7 +35,7 @@ end
 function SLIC(k::Int, m::Real; tol=1e-4, maxiter=10, fillorphan=true)
   @assert tol > 0 "invalid tolerance"
   @assert maxiter > 0 "invalid number of iterations"
-  SLIC(k, m, tol, maxiter, fillorphan)
+  SLIC(k, m, tol, maxiter)
 end
 
 function partition(data, method::SLIC)
