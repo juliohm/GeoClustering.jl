@@ -83,8 +83,8 @@ function partition(data, method::SLIC)
 
     for orphan in orphans
       P₀ = centroid(Ω, orphan)
-      lₖ = search(P₀, csearcher)[1]
-      l[orphan] = l[assigned[lₖ]]
+      i = search(P₀, csearcher)[1]
+      l[orphan] = l[assigned[i]]
     end
   end
 
