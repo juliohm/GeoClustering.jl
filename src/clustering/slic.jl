@@ -32,7 +32,7 @@ struct SLIC <: ClusteringMethod
   maxiter::Int
 end
 
-function SLIC(k::Int, m::Real; tol=1e-4, maxiter=10, fillorphan=true)
+function SLIC(k::Int, m::Real; tol=1e-4, maxiter=10)
   @assert tol > 0 "invalid tolerance"
   @assert maxiter > 0 "invalid number of iterations"
   SLIC(k, m, tol, maxiter)
@@ -75,15 +75,15 @@ function partition(data, method::SLIC)
     iter += 1
   end
 
-  if method.fillorphan
-    inds      = findall(iszero, l)
-    orphans   = [coordinates(domain(Ω)[i]) for i in inds]
-    centroids = [coordinates(centroid(Ω, cₖ)) for cₖ in c]
+  inds = findall(iszero, l)
+  if length(inds) > 0
+    linds = findall(!iszero, l)
+    Ω₀ = view(domain(Ω), linds)
+    csearcher = KNearestSearch(Ω₀, 1)
 
-    for (i, orphan) in zip(inds, orphans)
-      dc   = pairwise(Euclidean(), centroids, [orphan])
-      k    = argmin(dc)[1]
-      l[i] = k
+    for i in inds
+      lₖ = search(domain(Ω)[i], csearcher)[1]
+      l[i] = l[linds[lₖ]]
     end
   end
 
