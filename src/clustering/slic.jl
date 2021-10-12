@@ -82,8 +82,8 @@ function partition(data, method::SLIC)
     csearcher = KNearestSearch(Ω₀, 1)
 
     for orphan in orphans
-      P₀ = centroid(Ω, orphan)
-      i = search(P₀, csearcher)[1]
+      p = centroid(Ω, orphan)
+      i = search(p, csearcher)[1]
       l[orphan] = l[assigned[i]]
     end
   end
