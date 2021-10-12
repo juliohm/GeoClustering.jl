@@ -30,18 +30,22 @@ struct SLIC <: ClusteringMethod
   m::Float64
   tol::Float64
   maxiter::Int
+  weights::Any
 end
 
-function SLIC(k::Int, m::Real; tol=1e-4, maxiter=10)
+function SLIC(k::Int, m::Real; tol=1e-4, maxiter=10, weights=nothing)
   @assert tol > 0 "invalid tolerance"
   @assert maxiter > 0 "invalid number of iterations"
-  SLIC(k, m, tol, maxiter)
+  SLIC(k, m, tol, maxiter, weights)
 end
 
 function partition(data, method::SLIC)
   # normalize atributes
   𝒯 = TableDistances.normalize(values(data))
   Ω = georef(first(𝒯), domain(data))
+
+  # Get the weights for each attribute
+  w = method.weights
 
   # SLIC hyperparameter
   m = method.m
@@ -68,7 +72,7 @@ function partition(data, method::SLIC)
   while err > tol && iter < maxiter
     o = copy(c)
 
-    slic_assignment!(Ω, searcher, m, s, c, l, d)
+    slic_assignment!(Ω, searcher, m, s, c, l, d, w)
     slic_update!(Ω, c, l)
 
     err = norm(c - o) / norm(o)
@@ -120,7 +124,7 @@ function slic_initialization(data, s)
   unique(clusters)
 end
 
-function slic_assignment!(data, searcher, m, s, c, l, d)
+function slic_assignment!(data, searcher, m, s, c, l, d, w)
   for (k, cₖ) in enumerate(c)
     pₖ = centroid(data, cₖ)
     inds = search(pₖ, searcher)
@@ -135,7 +139,8 @@ function slic_assignment!(data, searcher, m, s, c, l, d)
     𝒮ₖ = view(data, [cₖ])
     V  = values(𝒮ᵢ)
     vₖ = values(𝒮ₖ)
-    dᵥ = pairwise(TableDistance(normalize=false), V, vₖ)
+    td = TableDistance(normalize=false, weights=w)
+    dᵥ = pairwise(td, V, vₖ)
 
     # total distance
     dₜ = @. √(dᵥ^2 + m^2 * (dₛ/s)^2)
