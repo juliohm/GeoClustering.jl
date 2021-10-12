@@ -139,7 +139,7 @@ function slic_assignment!(data, searcher, weights, m, s, c, l, d)
     𝒮ₖ = view(data, [cₖ])
     V  = values(𝒮ᵢ)
     vₖ = values(𝒮ₖ)
-    td = TableDistance(normalize=false, weights=w)
+    td = TableDistance(normalize=false, weights=weights)
     dᵥ = pairwise(td, V, vₖ)
 
     # total distance
