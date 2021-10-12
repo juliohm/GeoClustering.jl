@@ -19,6 +19,7 @@ The tradeoff is controlled with a hyperparameter parameter
 * `m`       - Hyperparameter of SLIC model
 * `tol`     - Tolerance of k-means algorithm (default to `1e-4`)
 * `maxiter` - Maximum number of iterations (default to `10`)
+* `weights` - Dictionary with weights for each attribute (default to `nothing`)
 
 ## References
 
