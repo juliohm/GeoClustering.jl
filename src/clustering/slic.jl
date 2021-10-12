@@ -75,15 +75,16 @@ function partition(data, method::SLIC)
     iter += 1
   end
 
-  inds = findall(iszero, l)
-  if length(inds) > 0
-    linds = findall(!iszero, l)
-    Ω₀ = view(domain(Ω), linds)
+  orphans = findall(iszero, l)
+  if length(orphans) > 0
+    assigneds = findall(!iszero, l)
+    Ω₀ = view(domain(Ω), assigneds)
     csearcher = KNearestSearch(Ω₀, 1)
 
-    for i in inds
-      lₖ = search(domain(Ω)[i], csearcher)[1]
-      l[i] = l[linds[lₖ]]
+    for orphan in orphans
+      P₀ = centroid(Ω, orphan)
+      lₖ = search(P₀, csearcher)[1]
+      l[orphan] = l[assigneds[lₖ]]
     end
   end
 
