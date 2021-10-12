@@ -26,18 +26,18 @@ The tradeoff is controlled with a hyperparameter parameter
 * Achanta et al. 2011. [SLIC superpixels compared to state-of-the-art
   superpixel methods](https://ieeexplore.ieee.org/document/6205760)
 """
-struct SLIC <: ClusteringMethod
+struct SLIC{W} <: ClusteringMethod
   k::Int
   m::Float64
   tol::Float64
   maxiter::Int
-  weights::Any
+  weights::W
 end
 
 function SLIC(k::Int, m::Real; tol=1e-4, maxiter=10, weights=nothing)
   @assert tol > 0 "invalid tolerance"
   @assert maxiter > 0 "invalid number of iterations"
-  SLIC(k, m, tol, maxiter, weights)
+  SLIC{typeof(weights)}(k, m, tol, maxiter, weights)
 end
 
 function partition(data, method::SLIC)
