@@ -38,10 +38,20 @@
   @test Set(C.cluster) ⊆ Set(1:2)
 
   # test SLIC with weights in attribute columns
-  Z = (a=rand(10), b=1:10, x=rand(10), y=rand(10))
-  w = Dict(:a => 10, :b => 1)
-  𝒮 = georef(Z, (:x, :y))
-  C = cluster(𝒮, SLIC(2, 1.0, weights=w))
-  @test domain(C) == domain(𝒮)
-  @test Set(C.cluster) ⊆ Set(1:2)
+  z1 = [√((i-0)^2+(j-0)^2) for i in 1:100, j in 1:100]
+  z2 = [√((i-100)^2+(j-100)^2) for i in 1:100, j in 1:100]
+  Z = (z1=z1, z2=z2)
+  w1 = Dict(:z1 => 10, :z2 => 0.1)
+  w2 = Dict(:z1 => 0.1, :z2 => 10)
+  𝒮 = georef(Z)
+  p1 = partition(𝒮, SLIC(50, 0.001, weights=w1))
+  p2 = partition(𝒮, SLIC(50, 0.001, weights=w2))
+
+  @test length(p1) == 49
+  @test length(p2) == 49
+  
+  if visualtests
+    @test_reference "data/slic-(0,0).png" plot(p1)
+    @test_reference "data/slic-(100,100).png" plot(p2)
+  end
 end
