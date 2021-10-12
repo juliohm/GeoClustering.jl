@@ -124,7 +124,7 @@ function slic_initialization(data, s)
   unique(clusters)
 end
 
-function slic_assignment!(data, searcher, m, s, c, l, d, w)
+function slic_assignment!(data, searcher, weights, m, s, c, l, d)
   for (k, cₖ) in enumerate(c)
     pₖ = centroid(data, cₖ)
     inds = search(pₖ, searcher)
