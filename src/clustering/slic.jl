@@ -77,14 +77,14 @@ function partition(data, method::SLIC)
 
   orphans = findall(iszero, l)
   if length(orphans) > 0
-    assigneds = findall(!iszero, l)
-    Ω₀ = view(domain(Ω), assigneds)
+    assigned = findall(!iszero, l)
+    Ω₀ = view(domain(Ω), assigned)
     csearcher = KNearestSearch(Ω₀, 1)
 
     for orphan in orphans
       P₀ = centroid(Ω, orphan)
       lₖ = search(P₀, csearcher)[1]
-      l[orphan] = l[assigneds[lₖ]]
+      l[orphan] = l[assigned[lₖ]]
     end
   end
 
