@@ -44,8 +44,8 @@ function partition(data, method::SLIC)
   𝒯 = TableDistances.normalize(values(data))
   Ω = georef(first(𝒯), domain(data))
 
-  # Get the weights for each attribute
-  w = method.weights
+  # weights for each attribute
+  weights = method.weights
 
   # SLIC hyperparameter
   m = method.m
