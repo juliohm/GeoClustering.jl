@@ -72,7 +72,7 @@ function partition(data, method::SLIC)
   while err > tol && iter < maxiter
     o = copy(c)
 
-    slic_assignment!(Ω, searcher, m, s, c, l, d, w)
+    slic_assignment!(Ω, searcher, weights, m, s, c, l, d)
     slic_update!(Ω, c, l)
 
     err = norm(c - o) / norm(o)
