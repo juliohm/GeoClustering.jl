@@ -75,6 +75,19 @@ function partition(data, method::SLIC)
     iter += 1
   end
 
+  orphans = findall(iszero, l)
+  if length(orphans) > 0
+    assigned = findall(!iszero, l)
+    Ω₀ = view(domain(Ω), assigned)
+    csearcher = KNearestSearch(Ω₀, 1)
+
+    for orphan in orphans
+      p = centroid(Ω, orphan)
+      i = search(p, csearcher)[1]
+      l[orphan] = l[assigned[i]]
+    end
+  end
+
   subsets = [findall(isequal(k), l) for k in 1:length(c)]
 
   Partition(data, subsets)
