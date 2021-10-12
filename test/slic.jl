@@ -49,7 +49,7 @@
   @test length(p2) == 49
   
   if visualtests
-    @test_reference "data/slic-(0,0).png" plot(p1)
-    @test_reference "data/slic-(100,100).png" plot(p2)
+    @test_reference "data/slic-w1.png" plot(p1)
+    @test_reference "data/slic-w2.png" plot(p2)
   end
 end
