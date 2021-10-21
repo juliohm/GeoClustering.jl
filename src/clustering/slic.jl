@@ -103,13 +103,9 @@ function slic_spacing(data, method)
   _spacings(method.k, sides(bbox))
 end
 
-"""
-    _spacings(k, l)
-
-Given the desired number of clusters and the sides of the bounding box
-of the geometry, returns a vector of spacings for each dimension of the
-bounding box.
-"""
+# Given the desired number of clusters and the sides of the bounding box
+# of the geometry, returns a vector of spacings for each dimension of the
+# bounding box.
 function _spacings(k, l)
   d = length(l)
   
