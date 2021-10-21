@@ -15,7 +15,7 @@
 
   𝒮 = georef((z=[√(i^2+j^2) for i in 1:100, j in 1:100],))
   p = partition(𝒮, SLIC(50, 0.001))
-  @test length(p) == 49
+  @test 40 ≤ length(p) ≤ 60
 
   if visualtests
     @test_reference "data/slic.png" plot(p)
@@ -45,8 +45,8 @@
   w2 = Dict(:z1 => 0.1, :z2 => 10)
   p1 = partition(𝒮, SLIC(50, 0.001, weights=w1))
   p2 = partition(𝒮, SLIC(50, 0.001, weights=w2))
-  @test length(p1) == 49
-  @test length(p2) == 49
+  @test 40 ≤ length(p1) ≤ 60
+  @test 40 ≤ length(p2) ≤ 60
   
   if visualtests
     @test_reference "data/slic-w1.png" plot(p1)
