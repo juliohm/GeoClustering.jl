@@ -52,4 +52,10 @@
     @test_reference "data/slic-w1.png" plot(p1)
     @test_reference "data/slic-w2.png" plot(p2)
   end
+
+  # test GeoClustering.slic_srecursion function
+  k     = 20
+  sides = [10.0, 100.0, 1000.0]
+  sp    = GeoClustering.slic_srecursion(k, sides)
+  @test sp[1] == 10/3 && sp[2] == 100/3 && sp[3] == 1000/3
 end

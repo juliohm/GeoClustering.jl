@@ -98,15 +98,12 @@ function partition(data, method::SLIC)
   Partition(data, subsets)
 end
 
-function slic_spacing(data, method)
-  bbox  = boundingbox(data)
-  _spacings(method.k, sides(bbox))
-end
+slic_spacing(data, method) = slic_srecursion(method.k, sides(boundingbox(data)))
 
 # Given the desired number of clusters and the sides of the bounding box
 # of the geometry, returns a vector of spacings for each dimension of the
 # bounding box.
-function _spacings(k, l)
+function slic_srecursion(k, l)
   d = length(l)
   
   d == 1 && return [l[1] / k]
@@ -117,7 +114,7 @@ function _spacings(k, l)
   
   kₙ = ceil(Int, k/kⱼ)
   lₙ = [l[begin:j-1]; l[j+1:end]]
-  s  = _spacings(kₙ, lₙ)
+  s  = slic_srecursion(kₙ, lₙ)
   
   [s[begin:j-1]; [sⱼ]; s[j:end]]
 end
@@ -144,9 +141,9 @@ end
 
 function slic_assignment!(data, searcher, weights, m, s, c, l, d)
   for (k, cₖ) in enumerate(c)
+    sₘ = maximum(s)
     pₖ = centroid(data, cₖ)
     inds = search(pₖ, searcher)
-    sₘ = maximum(s)
 
     # distance between points
     X  = (coordinates(centroid(data, ind)) for ind in inds)
