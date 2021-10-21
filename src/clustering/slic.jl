@@ -99,24 +99,31 @@ function partition(data, method::SLIC)
 end
 
 function slic_spacing(data, method)
-  function spacings(k, l)
-    d = length(l)
-    
-    d == 1 && return [l[1] / k]
-    
-    j  = argmin(l)
-    kⱼ = ceil(Int, k^(1/d))
-    sⱼ = l[j]/kⱼ
-    
-    kₙ = ceil(Int, k/kⱼ)
-    lₙ = [l[begin:j-1]; l[j+1:end]]
-    s  = spacings(kₙ, lₙ)
-    
-    [s[begin:j-1]; [sⱼ]; s[j:end]]
-  end
-
   bbox  = boundingbox(data)
-  spacings(method.k, sides(bbox))
+  _spacings(method.k, sides(bbox))
+end
+
+"""
+    _spacings(k, l)
+
+Given the desired number of clusters and the sides of the bounding box
+of the geometry, returns a vector of spacings for each dimension of the
+bounding box.
+"""
+function _spacings(k, l)
+  d = length(l)
+  
+  d == 1 && return [l[1] / k]
+  
+  j  = argmax(l)
+  kⱼ = ceil(Int, k^(1/d))
+  sⱼ = l[j]/kⱼ
+  
+  kₙ = ceil(Int, k/kⱼ)
+  lₙ = [l[begin:j-1]; l[j+1:end]]
+  s  = _spacings(kₙ, lₙ)
+  
+  [s[begin:j-1]; [sⱼ]; s[j:end]]
 end
 
 function slic_initialization(data, s)
@@ -143,6 +150,7 @@ function slic_assignment!(data, searcher, weights, m, s, c, l, d)
   for (k, cₖ) in enumerate(c)
     pₖ = centroid(data, cₖ)
     inds = search(pₖ, searcher)
+    sₘ = maximum(s)
 
     # distance between points
     X  = (coordinates(centroid(data, ind)) for ind in inds)
@@ -158,7 +166,6 @@ function slic_assignment!(data, searcher, weights, m, s, c, l, d)
     dᵥ = pairwise(td, V, vₖ)
 
     # total distance
-    sₘ = maximum(s)
     dₜ = @. √(dᵥ^2 + m^2 * (dₛ/sₘ)^2)
 
     @inbounds for (i, ind) in enumerate(inds)
