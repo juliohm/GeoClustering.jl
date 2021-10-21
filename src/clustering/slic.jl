@@ -58,7 +58,7 @@ function partition(data, method::SLIC)
   c = slic_initialization(Ω, s)
 
   # ball neighborhood search
-  searcher = BallSearch(Ω, NormBall(s))
+  searcher = BallSearch(Ω, NormBall(maximum(s)))
 
   # pre-allocate memory for label and distance
   l = fill(0, nelements(Ω))
@@ -99,10 +99,26 @@ function partition(data, method::SLIC)
 end
 
 function slic_spacing(data, method)
-  V = measure(boundingbox(data))
-  d = embeddim(data)
+  function spacings(k, l)
+    d = length(l)
+    
+    d == 1 && return [l[1] / k]
+    
+    j  = argmin(l)
+    kⱼ = ceil(Int, k^(1/d))
+    sⱼ = l[j]/kⱼ
+    
+    kₙ = ceil(Int, k/kⱼ)
+    lₙ = [l[begin:j-1]; l[j+1:end]]
+    s  = spacings(kₙ, lₙ)
+    
+    [s[begin:j-1]; [sⱼ]; s[j:end]]
+  end
+
+  bbox  = boundingbox(data)
   k = method.k
-  (V/k) ^ (1/d)
+  edges = sides(bbox)
+  spacings(k, edges)
 end
 
 function slic_initialization(data, s)
@@ -116,7 +132,7 @@ function slic_initialization(data, s)
   # cluster centers
   clusters = Vector{Int}()
   neighbor = Vector{Int}(undef, 1)
-  ranges = [(l+s/2):s:u for (l, u) in zip(lo, up)]
+  ranges = [(l+sᵢ/2):sᵢ:u for (l, sᵢ, u) in zip(lo, s, up)]
   for x in Iterators.product(ranges...)
     search!(neighbor, Point(x), searcher)
     push!(clusters, neighbor[1])
@@ -144,7 +160,8 @@ function slic_assignment!(data, searcher, weights, m, s, c, l, d)
     dᵥ = pairwise(td, V, vₖ)
 
     # total distance
-    dₜ = @. √(dᵥ^2 + m^2 * (dₛ/s)^2)
+    sₘ = maximum(s)
+    dₜ = @. √(dᵥ^2 + m^2 * (dₛ/sₘ)^2)
 
     @inbounds for (i, ind) in enumerate(inds)
       if dₜ[i] < d[ind]
