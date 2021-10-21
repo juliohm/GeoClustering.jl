@@ -117,8 +117,7 @@ function slic_spacing(data, method)
 
   bbox  = boundingbox(data)
   k = method.k
-  edges = sides(bbox)
-  spacings(k, edges)
+  spacings(method.k, sides(bbox))
 end
 
 function slic_initialization(data, s)
