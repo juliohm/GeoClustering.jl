@@ -116,7 +116,6 @@ function slic_spacing(data, method)
   end
 
   bbox  = boundingbox(data)
-  k = method.k
   spacings(method.k, sides(bbox))
 end
 
