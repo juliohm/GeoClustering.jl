@@ -3,7 +3,7 @@ using Meshes
 using GeoStatsBase
 using MLJ: @load
 using Test, Random, Plots
-using ReferenceTests, ImageIO
+using ReferenceTests, ImageIO, FileIO
 
 # workaround GR warnings
 ENV["GKSwstype"] = "100"

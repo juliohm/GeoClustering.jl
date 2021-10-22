@@ -58,4 +58,28 @@
   l = [10.0, 100.0, 1000.0]
   s = GeoClustering.slic_srecursion(k, l)
   @test s[1] == 10/3 && s[2] == 100/3 && s[3] == 1000/3
+
+  # test SLIC with known problematic domain
+  k = 1
+  m = 0.000001
+  x = LinRange(550350.6224548942, 552307.2106300013, 1200)
+  y = LinRange(9.35909841165263e6, 9.36050447440832e6, 1200)
+  z = LinRange(-44.90690201082941, 351.4007207008662, 1200)
+  Z = (x = x, y = y, z = z, a = rand(1200))
+  𝒮 = georef(Z, (:x, :y, :z))
+  s = GeoClustering.slic_spacing(𝒮, SLIC(k, m))
+  c = GeoClustering.slic_initialization(𝒮, s)
+  @test s[1] == 1956.5881751070265 && s[2] == 1406.062755689025 && s[3] == 396.3076227116956
+  @test length(c) == 1
+
+  # visual SLIC test for the μCT image
+  k = 45
+  m = 0.55
+  μCT = load("data/muCT.tif")
+  𝒮 = georef((μCT = Float64.(μCT),))
+  p1 = partition(𝒮, SLIC(45, 0.55))
+
+  if visualtests
+    @test_reference "data/muCT.png" plot(p1)
+  end
 end
