@@ -144,8 +144,8 @@ function slic_initialization(data, s)
 end
 
 function slic_assignment!(data, searcher, weights, m, s, c, l, d)
+  sₘ = maximum(s)
   for (k, cₖ) in enumerate(c)
-    sₘ = maximum(s)
     pₖ = centroid(data, cₖ)
     inds = search(pₖ, searcher)
 
