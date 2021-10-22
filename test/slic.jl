@@ -54,8 +54,8 @@
   end
 
   # test GeoClustering.slic_srecursion function
-  k     = 20
-  sides = [10.0, 100.0, 1000.0]
-  sp    = GeoClustering.slic_srecursion(k, sides)
-  @test sp[1] == 10/3 && sp[2] == 100/3 && sp[3] == 1000/3
+  k = 20
+  l = [10.0, 100.0, 1000.0]
+  s = GeoClustering.slic_srecursion(k, l)
+  @test s[1] == 10/3 && s[2] == 100/3 && s[3] == 1000/3
 end
