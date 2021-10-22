@@ -15,7 +15,7 @@
 
   𝒮 = georef((z=[√(i^2+j^2) for i in 1:100, j in 1:100],))
   p = partition(𝒮, SLIC(50, 0.001))
-  @test 40 ≤ length(p) ≤ 60
+  @test 50 ≤ length(p) ≤ 60
 
   if visualtests
     @test_reference "data/slic.png" plot(p)
