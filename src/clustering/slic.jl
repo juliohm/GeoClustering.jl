@@ -100,9 +100,8 @@ end
 
 slic_spacing(data, method) = slic_srecursion(method.k, sides(boundingbox(data)))
 
-# Given the desired number of clusters and the sides of the bounding box
-# of the geometry, returns a vector of spacings for each dimension of the
-# bounding box.
+# given the desired number of clusters and the sides of the bounding box
+# of the domain, returns the spacing for each dimension recursively
 function slic_srecursion(k, l)
   d = length(l)
   
