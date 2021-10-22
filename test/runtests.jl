@@ -4,6 +4,7 @@ using GeoStatsBase
 using MLJ: @load
 using Test, Random, Plots
 using ReferenceTests, ImageIO
+using FileIO # to load test images from disk
 
 # workaround GR warnings
 ENV["GKSwstype"] = "100"

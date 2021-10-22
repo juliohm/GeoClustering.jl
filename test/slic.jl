@@ -15,7 +15,7 @@
 
   𝒮 = georef((z=[√(i^2+j^2) for i in 1:100, j in 1:100],))
   p = partition(𝒮, SLIC(50, 0.001))
-  @test length(p) == 49
+  @test 50 ≤ length(p) ≤ 60
 
   if visualtests
     @test_reference "data/slic.png" plot(p)
@@ -45,11 +45,47 @@
   w2 = Dict(:z1 => 0.1, :z2 => 10)
   p1 = partition(𝒮, SLIC(50, 0.001, weights=w1))
   p2 = partition(𝒮, SLIC(50, 0.001, weights=w2))
-  @test length(p1) == 49
-  @test length(p2) == 49
+  @test 50 ≤ length(p1) ≤ 60
+  @test 50 ≤ length(p2) ≤ 60
   
   if visualtests
     @test_reference "data/slic-w1.png" plot(p1)
     @test_reference "data/slic-w2.png" plot(p2)
+  end
+
+  # test GeoClustering.slic_srecursion function
+  k = 20
+  l = [10.0, 100.0, 1000.0]
+  s = GeoClustering.slic_srecursion(k, l)
+  @test s[1] == 10/3 && s[2] == 100/3 && s[3] == 1000/3
+
+  # the following test deals with the case where the bounding box
+  # of the data has very different sides, one of which is too small
+  # we want to make sure that the initialization of centroids always
+  # returns a non-empty set
+  k = 1
+  m = 0.000001
+  x = LinRange(550350.6224548942, 552307.2106300013, 1200)
+  y = LinRange(9.35909841165263e6, 9.36050447440832e6, 1200)
+  z = LinRange(-44.90690201082941, 351.4007207008662, 1200)
+  Z = (x = x, y = y, z = z, a = rand(1200))
+  𝒮 = georef(Z, (:x, :y, :z))
+  s = GeoClustering.slic_spacing(𝒮, SLIC(k, m))
+  bbox = boundingbox(𝒮)
+  lo, up = coordinates.(extrema(bbox))
+  ranges = [(l+sᵢ/2):sᵢ:u for (l, sᵢ, u) in zip(lo, s, up)]
+  @test !isempty(Iterators.product(ranges...))
+  c = GeoClustering.slic_initialization(𝒮, s)
+  @test !isempty(c)
+
+  # visual SLIC test for the μCT image
+  k = 45
+  m = 0.55
+  μCT = load("data/muCT.tif")
+  𝒮 = georef((μCT = Float64.(μCT),))
+  C = cluster(𝒮, SLIC(45, 0.55))
+
+  if visualtests
+    @test_reference "data/slic-muCT.png" plot(C)
   end
 end

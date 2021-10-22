@@ -58,7 +58,7 @@ function partition(data, method::SLIC)
   c = slic_initialization(Ω, s)
 
   # ball neighborhood search
-  searcher = BallSearch(Ω, NormBall(s))
+  searcher = BallSearch(Ω, NormBall(maximum(s)))
 
   # pre-allocate memory for label and distance
   l = fill(0, nelements(Ω))
@@ -98,11 +98,29 @@ function partition(data, method::SLIC)
   Partition(data, subsets)
 end
 
-function slic_spacing(data, method)
-  V = measure(boundingbox(data))
-  d = embeddim(data)
-  k = method.k
-  (V/k) ^ (1/d)
+slic_spacing(data, method) = slic_srecursion(method.k, sides(boundingbox(data)))
+
+# given the desired number of clusters and the sides of the bounding box
+# of the domain, returns the spacing for each dimension recursively
+function slic_srecursion(k, l)
+  d = length(l)
+  
+  # base case
+  d == 1 && return [l[1] / k]
+  
+  # compute the spacing for the j-th dimension
+  j  = argmax(l)
+  kⱼ = ceil(Int, k^(1/d))
+  sⱼ = l[j]/kⱼ
+  
+  # update the new k and l
+  kₙ = ceil(Int, k/kⱼ)
+  lₙ = [l[begin:j-1]; l[j+1:end]]
+
+  # then recursively compute the spacing for the remaining dimensions
+  s  = slic_srecursion(kₙ, lₙ)
+  
+  [s[begin:j-1]; [sⱼ]; s[j:end]]
 end
 
 function slic_initialization(data, s)
@@ -116,7 +134,7 @@ function slic_initialization(data, s)
   # cluster centers
   clusters = Vector{Int}()
   neighbor = Vector{Int}(undef, 1)
-  ranges = [(l+s/2):s:u for (l, u) in zip(lo, up)]
+  ranges = [(l+sᵢ/2):sᵢ:u for (l, sᵢ, u) in zip(lo, s, up)]
   for x in Iterators.product(ranges...)
     search!(neighbor, Point(x), searcher)
     push!(clusters, neighbor[1])
@@ -126,6 +144,7 @@ function slic_initialization(data, s)
 end
 
 function slic_assignment!(data, searcher, weights, m, s, c, l, d)
+  sₘ = maximum(s)
   for (k, cₖ) in enumerate(c)
     pₖ = centroid(data, cₖ)
     inds = search(pₖ, searcher)
@@ -144,7 +163,7 @@ function slic_assignment!(data, searcher, weights, m, s, c, l, d)
     dᵥ = pairwise(td, V, vₖ)
 
     # total distance
-    dₜ = @. √(dᵥ^2 + m^2 * (dₛ/s)^2)
+    dₜ = @. √(dᵥ^2 + m^2 * (dₛ/sₘ)^2)
 
     @inbounds for (i, ind) in enumerate(inds)
       if dₜ[i] < d[ind]
