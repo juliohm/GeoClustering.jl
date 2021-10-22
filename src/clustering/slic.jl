@@ -117,7 +117,7 @@ function slic_srecursion(k, l)
   kₙ = ceil(Int, k/kⱼ)
   lₙ = [l[begin:j-1]; l[j+1:end]]
 
-  # then recursively computes the spacing for the remaining dimensions
+  # then recursively compute the spacing for the remaining dimensions
   s  = slic_srecursion(kₙ, lₙ)
   
   [s[begin:j-1]; [sⱼ]; s[j:end]]
