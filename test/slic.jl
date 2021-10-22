@@ -80,6 +80,6 @@
   C = cluster(𝒮, SLIC(45, 0.55))
 
   if visualtests
-    @test_reference "data/muCT.png" plot(p1)
+    @test_reference "data/muCT.png" plot(C)
   end
 end
