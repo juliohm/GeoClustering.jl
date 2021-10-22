@@ -59,7 +59,10 @@
   s = GeoClustering.slic_srecursion(k, l)
   @test s[1] == 10/3 && s[2] == 100/3 && s[3] == 1000/3
 
-  # test SLIC with known problematic domain
+  # the following test deals with the case where the bounding box
+  # of the data has very different sides, one of which is too small
+  # we want to make sure that the initialization of centroids always
+  # returns a non-empty set
   k = 1
   m = 0.000001
   x = LinRange(550350.6224548942, 552307.2106300013, 1200)
@@ -68,9 +71,12 @@
   Z = (x = x, y = y, z = z, a = rand(1200))
   𝒮 = georef(Z, (:x, :y, :z))
   s = GeoClustering.slic_spacing(𝒮, SLIC(k, m))
+  bbox = boundingbox(𝒮)
+  lo, up = coordinates.(extrema(bbox))
+  ranges = [(l+sᵢ/2):sᵢ:u for (l, sᵢ, u) in zip(lo, s, up)]
+  @test !isempty(Iterators.product(ranges...))
   c = GeoClustering.slic_initialization(𝒮, s)
-  @test s[1] == 1956.5881751070265 && s[2] == 1406.062755689025 && s[3] == 396.3076227116956
-  @test length(c) == 1
+  @test !isempty(c)
 
   # visual SLIC test for the μCT image
   k = 45
