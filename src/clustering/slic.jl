@@ -106,14 +106,19 @@ slic_spacing(data, method) = slic_srecursion(method.k, sides(boundingbox(data)))
 function slic_srecursion(k, l)
   d = length(l)
   
+  # base case
   d == 1 && return [l[1] / k]
   
+  # calculate the spacing for the j-th dimension
   j  = argmax(l)
   kⱼ = ceil(Int, k^(1/d))
   sⱼ = l[j]/kⱼ
   
+  # update the new k and l
   kₙ = ceil(Int, k/kⱼ)
   lₙ = [l[begin:j-1]; l[j+1:end]]
+
+  # then recursively calculates the spacing for the remaining dimensions
   s  = slic_srecursion(kₙ, lₙ)
   
   [s[begin:j-1]; [sⱼ]; s[j:end]]
