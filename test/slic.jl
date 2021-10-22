@@ -77,7 +77,7 @@
   m = 0.55
   μCT = load("data/muCT.tif")
   𝒮 = georef((μCT = Float64.(μCT),))
-  p1 = partition(𝒮, SLIC(45, 0.55))
+  C = cluster(𝒮, SLIC(45, 0.55))
 
   if visualtests
     @test_reference "data/muCT.png" plot(p1)
