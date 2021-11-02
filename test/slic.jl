@@ -81,7 +81,7 @@
   # visual SLIC test for the μCT image
   k = 45
   m = 0.55
-  μCT = load("data/muCT.tif")
+  μCT = load(joinpath(datadir,"muCT.tif"))
   𝒮 = georef((μCT = Float64.(μCT),))
   C = cluster(𝒮, SLIC(45, 0.55))
 
