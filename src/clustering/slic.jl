@@ -58,7 +58,7 @@ function partition(data, method::SLIC)
   c = slic_initialization(Ω, s)
 
   # ball neighborhood search
-  searcher = BallSearch(Ω, NormBall(maximum(s)))
+  searcher = BallSearch(Ω, MetricBall(maximum(s)))
 
   # pre-allocate memory for label and distance
   l = fill(0, nelements(Ω))
@@ -68,7 +68,7 @@ function partition(data, method::SLIC)
   tol     = method.tol
   maxiter = method.maxiter
 
-  # k-means algorithm
+  # Lloyd's (a.k.a. k-means) algorithm
   err, iter = Inf, 0
   while err > tol && iter < maxiter
     o = copy(c)
