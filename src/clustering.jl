@@ -37,7 +37,7 @@ function cluster(data::Data, method; vars=nothing)
   @assert vars ⊆ dvars "variables not found in geospatial data"
 
   # view subset of variables
-  sel = TableOperations.select(tab, vars...)
+  sel = tab |> Select(vars)
 
   # perform clustering on selection
   _cluster(georef(sel, dom), method)

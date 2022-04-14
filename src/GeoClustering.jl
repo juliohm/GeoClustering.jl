@@ -9,7 +9,7 @@ using GeoStatsBase
 
 using Tables
 using TableDistances
-using TableOperations
+using TableTransforms
 using CategoricalArrays
 using Distances
 using Clustering
