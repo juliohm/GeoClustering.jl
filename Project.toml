@@ -1,7 +1,7 @@
 name = "GeoClustering"
 uuid = "7472b188-6dde-460e-bd07-96c4bc049f7e"
 authors = ["Júlio Hoffimann <julio.hoffimann@gmail.com> and contributors"]
-version = "0.2.11"
+version = "0.2.12"
 
 [deps]
 CategoricalArrays = "324d7699-5711-5eae-9e2f-1d82baa6b597"
