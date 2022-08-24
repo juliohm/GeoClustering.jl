@@ -3,6 +3,7 @@ using Meshes
 using GeoStatsBase
 using MLJ: @load
 using Test, Random, Plots
+using MeshPlots # TODO: replace by MeshViz
 using ReferenceTests, ImageIO
 using FileIO # to load test images from disk
 
