@@ -76,3 +76,4 @@ end
 
 include("clustering/slic.jl")
 include("clustering/ghc.jl")
+include("clustering/gsc.jl")

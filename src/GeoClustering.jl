@@ -16,6 +16,7 @@ using Clustering
 using Statistics
 using LinearAlgebra
 using SparseArrays
+using ArnoldiMethod
 
 import Meshes: partition
 import MLJModelInterface as MI
@@ -25,6 +26,7 @@ include("clustering.jl")
 export
   SLIC,
   GHC,
+  GSC,
   partition,
   cluster
 

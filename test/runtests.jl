@@ -6,6 +6,7 @@ using Test, Random, Plots
 using MeshPlots # TODO: replace by MeshViz
 using ReferenceTests, ImageIO
 using FileIO # to load test images from disk
+using Random
 
 # workaround GR warnings
 ENV["GKSwstype"] = "100"
@@ -20,7 +21,8 @@ datadir = joinpath(@__DIR__,"data")
 testfiles = [
   "mlj.jl",
   "slic.jl",
-  "ghc.jl"
+  "ghc.jl",
+  "gsc.jl"
 ]
 
 @testset "GeoClustering.jl" begin
