@@ -15,7 +15,7 @@ kernfun = Dict(
 """
     GHC(k, λ; kern=:epanechnikov, link=:ward)
 
-A method for partitioning spatial data into `k` clusters 
+A method for partitioning geospatial data into `k` clusters 
 according to a range `λ` using Geostatistical Hierarchical
 Clustering (GHC). The larger the range the more connected
 are nearby samples.
