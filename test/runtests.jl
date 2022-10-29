@@ -2,6 +2,7 @@ using GeoClustering
 using Meshes
 using GeoStatsBase
 using MLJ: @load
+using CategoricalArrays
 using Test, Random, Plots
 using MeshPlots # TODO: replace by MeshViz
 using ReferenceTests, ImageIO

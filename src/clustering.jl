@@ -60,12 +60,15 @@ function _cluster(data::Data, method::ClusteringMethod)
 end
 
 function _cluster(data::Data, model::MI.Model)
-  # perform clustering
   table = values(data)
-  θ, _, __ = MI.fit(model, 0, table)
-  labels = MI.predict(model, θ, table)
 
-  cluster = isprobabilistic(model) ? mode.(labels) : labels
+  θ, _, __ = MI.fit(model, 0, table)
+
+  cluster = if MI.prediction_type(model) == :probabilistic
+    MI.predict_mode(model, θ, table)
+  else
+    MI.predict(model, θ, table)
+  end
 
   georef((cluster=cluster,), domain(data))
 end
