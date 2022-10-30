@@ -64,7 +64,7 @@ function _cluster(data::Data, model::MI.Model)
 
   θ, _, __ = MI.fit(model, 0, table)
 
-  cluster = if MI.prediction_type(model) == :probabilistic
+  cluster = if isprobabilistic(model)
     MI.predict_mode(model, θ, table)
   else
     MI.predict(model, θ, table)
