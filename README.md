@@ -23,6 +23,14 @@ based on (cross-)variograms between covariates and on a kernel
 function between geospatial coordinates. The method is described
 in [Fouedjio, F. 2016](https://www.sciencedirect.com/science/article/abs/pii/S2211675316300367).
 
+### GSC
+
+Geostatistical Spectral Clustering (GSC) produces clusters
+based on the spectral decomposition of the graph Laplacian
+constructed with weights that are a function of features and
+locations. The method is described in
+[Romary et al. 2015](https://www.sciencedirect.com/science/article/pii/S0098300415001314)
+
 ## Installation
 
 Get the latest stable release with Julia's package manager:
