@@ -29,7 +29,7 @@ Geostatistical Spectral Clustering (GSC) produces clusters
 based on the spectral decomposition of the graph Laplacian
 constructed with weights that are a function of features and
 locations. The method is described in
-[Romary et al. 2015](https://www.sciencedirect.com/science/article/pii/S0098300415001314)
+[Romary et al. 2015](https://www.sciencedirect.com/science/article/pii/S0098300415001314).
 
 ## Installation
 
