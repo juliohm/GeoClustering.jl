@@ -3,12 +3,12 @@
   𝒮 = georef((Z=Z,))
   p = partition(𝒮, SLIC(4, 1.0))
   @test length(p) == 4
-  @test all(nelements.(p) .== 100)
-  p1, p2, p3, p4 = p
-  @test mean(coordinates(centroid(p1, ind)) for ind in 1:nelements(p1)) == [5.0,5.0]
-  @test mean(coordinates(centroid(p2, ind)) for ind in 1:nelements(p2)) == [15.0,5.0]
-  @test mean(coordinates(centroid(p3, ind)) for ind in 1:nelements(p3)) == [5.0,15.0]
-  @test mean(coordinates(centroid(p4, ind)) for ind in 1:nelements(p4)) == [15.0,15.0]
+  d1, d2, d3, d4 = domain.(p)
+  @test all(nelements.([d1,d2,d3,d4]) .== 100)
+  @test mean(coordinates.(centroid.(d1))) == [5.0,5.0]
+  @test mean(coordinates.(centroid.(d2))) == [15.0,5.0]
+  @test mean(coordinates.(centroid.(d3))) == [5.0,15.0]
+  @test mean(coordinates.(centroid.(d4))) == [15.0,15.0]
 
   C = cluster(𝒮, SLIC(4, 1.0))
   @test C.cluster == vec(Z')
@@ -68,14 +68,12 @@
   x = LinRange(550350.6224548942, 552307.2106300013, 1200)
   y = LinRange(9.35909841165263e6, 9.36050447440832e6, 1200)
   z = LinRange(-44.90690201082941, 351.4007207008662, 1200)
-  Z = (x = x, y = y, z = z, a = rand(1200))
-  𝒮 = georef(Z, (:x, :y, :z))
-  s = GeoClustering.slic_spacing(𝒮, SLIC(k, m))
-  bbox = boundingbox(𝒮)
-  lo, up = coordinates.(extrema(bbox))
+  𝒟 = PointSet(collect(zip(x, y, z)))
+  s = GeoClustering.slic_spacing(𝒟, SLIC(k, m))
+  lo, up = coordinates.(extrema(boundingbox(𝒟)))
   ranges = [(l+sᵢ/2):sᵢ:u for (l, sᵢ, u) in zip(lo, s, up)]
   @test !isempty(Iterators.product(ranges...))
-  c = GeoClustering.slic_initialization(𝒮, s)
+  c = GeoClustering.slic_initialization(𝒟, s)
   @test !isempty(c)
 
   # visual SLIC test for the μCT image

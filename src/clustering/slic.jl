@@ -41,28 +41,27 @@ function SLIC(k::Int, m::Real; tol=1e-4, maxiter=10, weights=nothing)
 end
 
 function partition(data, method::SLIC)
+  # retrieve parameters
+  w = method.weights
+  m = method.m
+
   # normalize atributes
   𝒯 = TableDistances.normalize(values(data))
   Ω = georef(first(𝒯), domain(data))
-
-  # weights for each attribute
-  weights = method.weights
-
-  # SLIC hyperparameter
-  m = method.m
+  𝒟 = domain(Ω)
 
   # initial spacing of clusters
-  s = slic_spacing(Ω, method)
+  s = slic_spacing(𝒟, method)
 
   # initialize cluster centers
-  c = slic_initialization(Ω, s)
+  c = slic_initialization(𝒟, s)
 
   # ball neighborhood search
-  searcher = BallSearch(Ω, MetricBall(maximum(s)))
+  searcher = BallSearch(𝒟, MetricBall(maximum(s)))
 
   # pre-allocate memory for label and distance
-  l = fill(0, nelements(Ω))
-  d = fill(Inf, nelements(Ω))
+  l = fill(0, nelements(𝒟))
+  d = fill(Inf, nelements(𝒟))
 
   # performance parameters
   tol     = method.tol
@@ -73,7 +72,7 @@ function partition(data, method::SLIC)
   while err > tol && iter < maxiter
     o = copy(c)
 
-    slic_assignment!(Ω, searcher, weights, m, s, c, l, d)
+    slic_assignment!(Ω, searcher, w, m, s, c, l, d)
     slic_update!(Ω, c, l)
 
     err = norm(c - o) / norm(o)
@@ -83,11 +82,11 @@ function partition(data, method::SLIC)
   orphans = findall(iszero, l)
   if length(orphans) > 0
     assigned = findall(!iszero, l)
-    Ω₀ = view(domain(Ω), assigned)
-    csearcher = KNearestSearch(Ω₀, 1)
+    𝒟₀ = view(𝒟, assigned)
+    csearcher = KNearestSearch(𝒟₀, 1)
 
     for orphan in orphans
-      p = centroid(Ω, orphan)
+      p = centroid(𝒟, orphan)
       i = search(p, csearcher)[1]
       l[orphan] = l[assigned[i]]
     end
@@ -98,7 +97,7 @@ function partition(data, method::SLIC)
   Partition(data, subsets)
 end
 
-slic_spacing(data, method) = slic_srecursion(method.k, sides(boundingbox(data)))
+slic_spacing(𝒟, method) = slic_srecursion(method.k, sides(boundingbox(𝒟)))
 
 # given the desired number of clusters and the sides of the bounding box
 # of the domain, returns the spacing for each dimension recursively
@@ -123,12 +122,12 @@ function slic_srecursion(k, l)
   [s[begin:j-1]; [sⱼ]; s[j:end]]
 end
 
-function slic_initialization(data, s)
+function slic_initialization(𝒟, s)
   # efficient neighbor search
-  searcher = KNearestSearch(data, 1)
+  searcher = KNearestSearch(𝒟, 1)
 
   # bounding box properties
-  bbox = boundingbox(data)
+  bbox = boundingbox(𝒟)
   lo, up = coordinates.(extrema(bbox))
 
   # cluster centers
@@ -143,15 +142,15 @@ function slic_initialization(data, s)
   unique(clusters)
 end
 
-function slic_assignment!(data, searcher, weights, m, s, c, l, d)
+function slic_assignment!(data, searcher, w, m, s, c, l, d)
   sₘ = maximum(s)
+  𝒟  = domain(data)
   for (k, cₖ) in enumerate(c)
-    pₖ = centroid(data, cₖ)
-    inds = search(pₖ, searcher)
+    inds = search(centroid(𝒟, cₖ), searcher)
 
-    # distance between points
-    X  = (coordinates(centroid(data, ind)) for ind in inds)
-    xₖ = [coordinates(pₖ)]
+    # distance between coordinates
+    X  = (coordinates(centroid(𝒟, i)) for i in inds)
+    xₖ = [coordinates(centroid(𝒟, cₖ))]
     dₛ = pairwise(Euclidean(), X, xₖ)
 
     # distance between variables
@@ -159,8 +158,7 @@ function slic_assignment!(data, searcher, weights, m, s, c, l, d)
     𝒮ₖ = view(data, [cₖ])
     V  = values(𝒮ᵢ)
     vₖ = values(𝒮ₖ)
-    td = TableDistance(normalize=false, weights=weights)
-    dᵥ = pairwise(td, V, vₖ)
+    dᵥ = pairwise(TableDistance(normalize=false, weights=w), V, vₖ)
 
     # total distance
     dₜ = @. √(dᵥ^2 + m^2 * (dₛ/sₘ)^2)
@@ -175,11 +173,12 @@ function slic_assignment!(data, searcher, weights, m, s, c, l, d)
 end
 
 function slic_update!(data, c, l)
+  𝒟 = domain(data)
   for k in 1:length(c)
     inds = findall(isequal(k), l)
-    X  = (coordinates(centroid(data, ind)) for ind in inds)
-    μ  = [mean(X)]
-    dₛ = pairwise(Euclidean(), X, μ)
+    X  = (coordinates(centroid(𝒟, i)) for i in inds)
+    xₖ = [mean(X)]
+    dₛ = pairwise(Euclidean(), X, xₖ)
     @inbounds c[k] = inds[argmin(vec(dₛ))]
   end
 end

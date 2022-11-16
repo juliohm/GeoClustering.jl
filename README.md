@@ -35,7 +35,7 @@ locations. The method is described in
 
 Get the latest stable release with Julia's package manager:
 
-```julia
+```
 ] add GeoClustering
 ```
 
