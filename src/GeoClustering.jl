@@ -23,11 +23,6 @@ import MLJModelInterface as MI
 
 include("clustering.jl")
 
-export
-  SLIC,
-  GHC,
-  GSC,
-  partition,
-  cluster
+export SLIC, GHC, GSC, partition, cluster
 
 end

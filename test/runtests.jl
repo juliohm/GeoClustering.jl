@@ -16,15 +16,10 @@ ENV["GKSwstype"] = "100"
 isCI = "CI" ∈ keys(ENV)
 islinux = Sys.islinux()
 visualtests = !isCI || (isCI && islinux)
-datadir = joinpath(@__DIR__,"data")
+datadir = joinpath(@__DIR__, "data")
 
 # list of tests
-testfiles = [
-  "mlj.jl",
-  "slic.jl",
-  "ghc.jl",
-  "gsc.jl"
-]
+testfiles = ["mlj.jl", "slic.jl", "ghc.jl", "gsc.jl"]
 
 @testset "GeoClustering.jl" begin
   for testfile in testfiles

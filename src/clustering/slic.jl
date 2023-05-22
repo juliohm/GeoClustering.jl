@@ -64,7 +64,7 @@ function partition(data, method::SLIC)
   d = fill(Inf, nelements(𝒟))
 
   # performance parameters
-  tol     = method.tol
+  tol = method.tol
   maxiter = method.maxiter
 
   # Lloyd's (a.k.a. k-means) algorithm
@@ -103,23 +103,23 @@ slic_spacing(𝒟, method) = slic_srecursion(method.k, sides(boundingbox(𝒟)))
 # of the domain, returns the spacing for each dimension recursively
 function slic_srecursion(k, l)
   d = length(l)
-  
+
   # base case
   d == 1 && return [l[1] / k]
-  
+
   # compute the spacing for the j-th dimension
-  j  = argmax(l)
-  kⱼ = ceil(Int, k^(1/d))
-  sⱼ = l[j]/kⱼ
-  
+  j = argmax(l)
+  kⱼ = ceil(Int, k^(1 / d))
+  sⱼ = l[j] / kⱼ
+
   # update the new k and l
-  kₙ = ceil(Int, k/kⱼ)
-  lₙ = l[[1:j-1; j+1:d]]
+  kₙ = ceil(Int, k / kⱼ)
+  lₙ = l[[1:(j - 1); (j + 1):d]]
 
   # then recursively compute the spacing for the remaining dimensions
-  s  = slic_srecursion(kₙ, lₙ)
-  
-  [s[begin:j-1]; [sⱼ]; s[j:end]]
+  s = slic_srecursion(kₙ, lₙ)
+
+  [s[begin:(j - 1)]; [sⱼ]; s[j:end]]
 end
 
 function slic_initialization(𝒟, s)
@@ -133,7 +133,7 @@ function slic_initialization(𝒟, s)
   # cluster centers
   clusters = Vector{Int}()
   neighbor = Vector{Int}(undef, 1)
-  ranges = [(l+sᵢ/2):sᵢ:u for (l, sᵢ, u) in zip(lo, s, up)]
+  ranges = [(l + sᵢ / 2):sᵢ:u for (l, sᵢ, u) in zip(lo, s, up)]
   for x in Iterators.product(ranges...)
     search!(neighbor, Point(x), searcher)
     push!(clusters, neighbor[1])
@@ -144,24 +144,24 @@ end
 
 function slic_assignment!(data, searcher, w, m, s, c, l, d)
   sₘ = maximum(s)
-  𝒟  = domain(data)
+  𝒟 = domain(data)
   for (k, cₖ) in enumerate(c)
     inds = search(centroid(𝒟, cₖ), searcher)
 
     # distance between coordinates
-    X  = (coordinates(centroid(𝒟, i)) for i in inds)
+    X = (coordinates(centroid(𝒟, i)) for i in inds)
     xₖ = [coordinates(centroid(𝒟, cₖ))]
     dₛ = pairwise(Euclidean(), X, xₖ)
 
     # distance between variables
     𝒮ᵢ = view(data, inds)
     𝒮ₖ = view(data, [cₖ])
-    V  = values(𝒮ᵢ)
+    V = values(𝒮ᵢ)
     vₖ = values(𝒮ₖ)
     dᵥ = pairwise(TableDistance(normalize=false, weights=w), V, vₖ)
 
     # total distance
-    dₜ = @. √(dᵥ^2 + m^2 * (dₛ/sₘ)^2)
+    dₜ = @. √(dᵥ^2 + m^2 * (dₛ / sₘ)^2)
 
     @inbounds for (i, ind) in enumerate(inds)
       if dₜ[i] < d[ind]
@@ -176,7 +176,7 @@ function slic_update!(data, c, l)
   𝒟 = domain(data)
   for k in 1:length(c)
     inds = findall(isequal(k), l)
-    X  = (coordinates(centroid(𝒟, i)) for i in inds)
+    X = (coordinates(centroid(𝒟, i)) for i in inds)
     xₖ = [mean(X)]
     dₛ = pairwise(Euclidean(), X, xₖ)
     @inbounds c[k] = inds[argmin(vec(dₛ))]

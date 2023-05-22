@@ -3,14 +3,10 @@
 # ------------------------------------------------------------------
 
 # auxiliary functions and variables
-uniform(h; λ)      = (h ≤ λ)
-triangular(h; λ)   = (h ≤ λ) * (λ - h)
+uniform(h; λ) = (h ≤ λ)
+triangular(h; λ) = (h ≤ λ) * (λ - h)
 epanechnikov(h; λ) = (h ≤ λ) * (λ^2 - h^2)
-kernfun = Dict(
-  :uniform => uniform,
-  :triangular => triangular,
-  :epanechnikov => epanechnikov
-)
+kernfun = Dict(:uniform => uniform, :triangular => triangular, :epanechnikov => epanechnikov)
 
 """
     GHC(k, λ; kern=:epanechnikov, link=:ward)
@@ -53,15 +49,15 @@ function GHC(k, λ; kern=:epanechnikov, link=:ward)
   # sanity checks
   @assert k > 0 "invalid number of clusters"
   @assert λ > 0 "invalid kernel range"
-  @assert kern ∈ [:uniform,:triangular,:epanechnikov] "invalid kernel function"
-  @assert link ∈ [:single,:average,:complete,:ward,:ward_presquared] "invalid linkage function"
+  @assert kern ∈ [:uniform, :triangular, :epanechnikov] "invalid kernel function"
+  @assert link ∈ [:single, :average, :complete, :ward, :ward_presquared] "invalid linkage function"
   GHC(k, λ, kern, link)
 end
 
 function partition(data, method::GHC)
   # GHC parameters
-  k    = method.k
-  λ    = method.λ
+  k = method.k
+  λ = method.λ
   kern = method.kern
   link = method.link
 
@@ -76,7 +72,7 @@ function partition(data, method::GHC)
 
   # convert labels to subsets
   maxlabel = maximum(labels)
-  subsets  = [Int[] for i in 1:maxlabel]
+  subsets = [Int[] for i in 1:maxlabel]
   for (i, l) in enumerate(labels)
     push!(subsets[l], i)
   end
@@ -102,7 +98,7 @@ end
 
 function ghc_kernel_matrix(kern, λ, 𝒟)
   # kernel function
-  fn    = kernfun[kern]
+  fn = kernfun[kern]
   Kλ(h) = fn(h, λ=λ)
 
   # collect coordinates
@@ -130,14 +126,14 @@ function ghc_diff_matrices(𝒯)
   @inbounds for j in 1:p
     Zj = ghc_normalize(covars[j])
     Δj = pairwise(Euclidean(), Zj)
-    for i in j+1:p
+    for i in (j + 1):p
       Zi = ghc_normalize(covars[i])
       Δi = pairwise(Euclidean(), Zi)
-      Δ[i,j] = Δi .* Δj
+      Δ[i, j] = Δi .* Δj
     end
-    Δ[j,j] = Δj .* Δj
-    for i in 1:j-1
-      Δ[i,j] = Δ[j,i] # leverage the symmetry
+    Δ[j, j] = Δj .* Δj
+    for i in 1:(j - 1)
+      Δ[i, j] = Δ[j, i] # leverage the symmetry
     end
   end
 
@@ -150,23 +146,23 @@ function ghc_variogram_sum(K, Δ)
   for Δₒ in Δ # for each covariate pair
     # update lower triangular matrix
     @inbounds for j in 1:n
-      kj = K[:,j]
-      for i in j+1:n
-        ki = K[:,i]
+      kj = K[:, j]
+      for i in (j + 1):n
+        ki = K[:, i]
         Kij = kron(ki, kj)
         I, W = findnz(Kij)
         num = sum(W .* Δₒ[I], init=0.0)
         den = sum(W, init=0.0)
-        iszero(den) || (Γ[i,j] += (1/2) * (num/den))
+        iszero(den) || (Γ[i, j] += (1 / 2) * (num / den))
       end
     end
   end
 
   # mirror upper triangular matrix
   @inbounds for j in 1:n
-    Γ[j,j] = 0.0
-    for i in 1:j-1
-      Γ[i,j] = Γ[j,i] # leverage the symmetry
+    Γ[j, j] = 0.0
+    for i in 1:(j - 1)
+      Γ[i, j] = Γ[j, i] # leverage the symmetry
     end
   end
 
