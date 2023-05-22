@@ -53,10 +53,10 @@ function partition(data, method::GSC)
   𝒟 = domain(data)
 
   # retrieve parameters
-  k       = method.k
-  m       = method.m
-  σ       = method.σ
-  tol     = method.tol
+  k = method.k
+  m = method.m
+  σ = method.σ
+  tol = method.tol
   maxiter = method.maxiter
   weights = method.weights
 
@@ -77,7 +77,7 @@ function partition(data, method::GSC)
   D = Diagonal(d)
 
   # Laplace matrix
-  L = D^(-1/2) * W * D^(-1/2)
+  L = D^(-1 / 2) * W * D^(-1 / 2)
 
   # solve eigenproblem
   S, _ = partialschur(L, nev=k)
@@ -89,7 +89,7 @@ function partition(data, method::GSC)
 
   # convert labels to subsets
   maxlabel = maximum(labels)
-  subsets  = [Int[] for i in 1:maxlabel]
+  subsets = [Int[] for i in 1:maxlabel]
   for (i, l) in enumerate(labels)
     push!(subsets[l], i)
   end

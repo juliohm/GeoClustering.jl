@@ -33,7 +33,7 @@ function cluster(data::Data, method; vars=nothing)
 
   # variables used for clustering
   dvars = Tables.schema(tab).names
-  vars  = isnothing(vars) ? dvars : vars
+  vars = isnothing(vars) ? dvars : vars
   @assert vars ⊆ dvars "variables not found in geospatial data"
 
   # view subset of variables
