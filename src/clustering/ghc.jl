@@ -82,7 +82,7 @@ function partition(data, method::GHC)
 end
 
 function ghc_dissimilarity_matrix(data, kern, λ)
-  # retrive domain/table
+  # retrieve domain/table
   𝒟 = domain(data)
   𝒯 = values(data)
 

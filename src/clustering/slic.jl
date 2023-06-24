@@ -45,7 +45,7 @@ function partition(data, method::SLIC)
   w = method.weights
   m = method.m
 
-  # normalize atributes
+  # normalize attributes
   𝒯 = TableDistances.normalize(values(data))
   Ω = georef(first(𝒯), domain(data))
   𝒟 = domain(Ω)
