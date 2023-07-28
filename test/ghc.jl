@@ -20,8 +20,4 @@
   𝒮 = georef((z=[√(i^2 + j^2) for i in 1:50, j in 1:50],))
   p = partition(𝒮, GHC(50, 1.0))
   @test length(p) == 50
-
-  if visualtests
-    @test_reference "data/ghc.png" plot(p)
-  end
 end

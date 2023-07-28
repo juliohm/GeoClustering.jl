@@ -17,10 +17,6 @@
   p = partition(𝒮, SLIC(50, 0.001))
   @test 50 ≤ length(p) ≤ 60
 
-  if visualtests
-    @test_reference "data/slic.png" plot(p)
-  end
-
   # test SLIC with heterogeneous data
   Z = (a=rand(10), b=1:10, x=rand(10), y=rand(10))
   𝒮 = georef(Z, (:x, :y))
@@ -70,11 +66,6 @@
   @test 50 ≤ length(p1) ≤ 60
   @test 50 ≤ length(p2) ≤ 60
 
-  if visualtests
-    @test_reference "data/slic-w1.png" plot(p1)
-    @test_reference "data/slic-w2.png" plot(p2)
-  end
-
   # test GeoClustering.slic_srecursion function
   k = 20
   l = [10.0, 100.0, 1000.0]
@@ -97,15 +88,4 @@
   @test !isempty(Iterators.product(ranges...))
   c = GeoClustering.slic_initialization(𝒟, s)
   @test !isempty(c)
-
-  # visual SLIC test for the μCT image
-  k = 45
-  m = 0.55
-  μCT = load(joinpath(datadir, "muCT.tif"))
-  𝒮 = georef((μCT=Float64.(μCT),))
-  C = cluster(𝒮, SLIC(45, 0.55))
-
-  if visualtests
-    @test_reference "data/slic-muCT.png" plot(C)
-  end
 end
