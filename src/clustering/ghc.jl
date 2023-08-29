@@ -6,7 +6,8 @@
 uniform(h; λ) = (h ≤ λ)
 triangular(h; λ) = (h ≤ λ) * (λ - h)
 epanechnikov(h; λ) = (h ≤ λ) * (λ^2 - h^2)
-kernfun = Dict(:uniform => uniform, :triangular => triangular, :epanechnikov => epanechnikov)
+
+const KERNFUN = Dict(:uniform => uniform, :triangular => triangular, :epanechnikov => epanechnikov)
 
 """
     GHC(k, λ; kern=:epanechnikov, link=:ward)
@@ -54,7 +55,7 @@ function GHC(k, λ; kern=:epanechnikov, link=:ward)
   GHC(k, λ, kern, link)
 end
 
-function partition(data, method::GHC)
+function partitioninds(::AbstractRNG, data, method::GHC)
   # GHC parameters
   k = method.k
   λ = method.λ
@@ -78,7 +79,7 @@ function partition(data, method::GHC)
   end
 
   # return partition
-  Partition(data, subsets)
+  subsets, Dict()
 end
 
 function ghc_dissimilarity_matrix(data, kern, λ)
@@ -98,7 +99,7 @@ end
 
 function ghc_kernel_matrix(kern, λ, 𝒟)
   # kernel function
-  fn = kernfun[kern]
+  fn = KERNFUN[kern]
   Kλ(h) = fn(h, λ=λ)
 
   # collect coordinates

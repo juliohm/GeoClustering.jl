@@ -8,6 +8,7 @@ using Meshes
 using GeoStatsBase
 
 using Tables
+using Random
 using TableDistances
 using TableTransforms
 using CategoricalArrays
@@ -18,7 +19,7 @@ using LinearAlgebra
 using SparseArrays
 using ArnoldiMethod
 
-import Meshes: partition
+import Meshes: partitioninds
 import MLJModelInterface as MI
 
 include("clustering.jl")
