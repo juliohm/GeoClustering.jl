@@ -2,6 +2,7 @@
 BetaML = "024491cd-cc6b-443e-8034-08ea7eb7db2b"
 CategoricalArrays = "324d7699-5711-5eae-9e2f-1d82baa6b597"
 GeoStatsBase = "323cb8eb-fbf6-51c0-afd0-f8fba70507b2"
+GeoTables = "e502b557-6362-48c1-8219-d30d308dcdb0"
 MLJ = "add582a8-e3ab-11e8-2d5e-e98b27df1bc7"
 MLJClusteringInterface = "d354fa79-ed1c-40d4-88ef-b8c7bd1568af"
 Meshes = "eacbb407-ea5a-433e-ab97-5258b1ca43fa"

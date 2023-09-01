@@ -26,7 +26,7 @@ Alternatively, cluster geospatial `data` with
 [`MLJ`](https://github.com/alan-turing-institute/MLJ.jl)
 model.
 """
-function cluster(data::Data, method; vars=nothing)
+function cluster(data::AbstractGeoTable, method; vars=nothing)
   # retrieve data
   tab = values(data)
   dom = domain(data)
@@ -43,7 +43,7 @@ function cluster(data::Data, method; vars=nothing)
   _cluster(georef(sel, dom), method)
 end
 
-function _cluster(data::Data, method::ClusteringMethod)
+function _cluster(data::AbstractGeoTable, method::ClusteringMethod)
   d = domain(data)
   p = partition(data, method)
 
@@ -59,7 +59,7 @@ function _cluster(data::Data, method::ClusteringMethod)
   georef(t, d)
 end
 
-function _cluster(data::Data, model::MI.Model)
+function _cluster(data::AbstractGeoTable, model::MI.Model)
   table = values(data)
 
   θ, _, __ = MI.fit(model, 0, table)

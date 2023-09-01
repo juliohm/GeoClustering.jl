@@ -5,6 +5,7 @@
 module GeoClustering
 
 using Meshes
+using GeoTables
 using GeoStatsBase
 
 using Tables
