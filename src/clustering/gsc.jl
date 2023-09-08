@@ -47,7 +47,7 @@ function GSC(k, m; σ=1.0, tol=1e-4, maxiter=10, weights=nothing)
   GSC(k, m, σ, tol, maxiter, weights)
 end
 
-function partition(data, method::GSC)
+function partitioninds(::AbstractRNG, data::AbstractGeoTable, method::GSC)
   # retrieve table and domain
   𝒯 = values(data)
   𝒟 = domain(data)
@@ -94,6 +94,6 @@ function partition(data, method::GSC)
     push!(subsets[l], i)
   end
 
-  # return partition
-  Partition(data, subsets)
+  # return subsets
+  subsets, Dict()
 end
