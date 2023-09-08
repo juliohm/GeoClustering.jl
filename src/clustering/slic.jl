@@ -40,14 +40,14 @@ function SLIC(k::Int, m::Real; tol=1e-4, maxiter=10, weights=nothing)
   SLIC{typeof(weights)}(k, m, tol, maxiter, weights)
 end
 
-function partitioninds(::AbstractRNG, data, method::SLIC)
+function partitioninds(::AbstractRNG, geotable::AbstractGeoTable, method::SLIC)
   # retrieve parameters
   w = method.weights
   m = method.m
 
   # normalize attributes
-  𝒯 = TableDistances.normalize(values(data))
-  Ω = georef(first(𝒯), domain(data))
+  𝒯 = TableDistances.normalize(values(geotable))
+  Ω = georef(first(𝒯), domain(geotable))
   𝒟 = domain(Ω)
 
   # initial spacing of clusters
@@ -142,9 +142,9 @@ function slic_initialization(𝒟, s)
   unique(clusters)
 end
 
-function slic_assignment!(data, searcher, w, m, s, c, l, d)
+function slic_assignment!(geotable, searcher, w, m, s, c, l, d)
   sₘ = maximum(s)
-  𝒟 = domain(data)
+  𝒟 = domain(geotable)
   for (k, cₖ) in enumerate(c)
     inds = search(centroid(𝒟, cₖ), searcher)
 
@@ -154,8 +154,8 @@ function slic_assignment!(data, searcher, w, m, s, c, l, d)
     dₛ = pairwise(Euclidean(), X, xₖ)
 
     # distance between variables
-    𝒮ᵢ = view(data, inds)
-    𝒮ₖ = view(data, [cₖ])
+    𝒮ᵢ = view(geotable, inds)
+    𝒮ₖ = view(geotable, [cₖ])
     V = values(𝒮ᵢ)
     vₖ = values(𝒮ₖ)
     dᵥ = pairwise(TableDistance(normalize=false, weights=w), V, vₖ)
@@ -172,9 +172,9 @@ function slic_assignment!(data, searcher, w, m, s, c, l, d)
   end
 end
 
-function slic_update!(data, c, l)
-  𝒟 = domain(data)
-  for k in 1:length(c)
+function slic_update!(geotable, c, l)
+  𝒟 = domain(geotable)
+  for k in eachindex(c)
     inds = findall(isequal(k), l)
     X = (coordinates(centroid(𝒟, i)) for i in inds)
     xₖ = [mean(X)]

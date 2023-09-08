@@ -1,5 +1,6 @@
 using GeoClustering
 using Meshes
+using GeoTables
 using GeoStatsBase
 using MLJ: @load
 using CategoricalArrays

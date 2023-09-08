@@ -26,10 +26,10 @@ Alternatively, cluster geospatial `data` with
 [`MLJ`](https://github.com/alan-turing-institute/MLJ.jl)
 model.
 """
-function cluster(data::Data, method; vars=nothing)
+function cluster(geotable::AbstractGeoTable, method; vars=nothing)
   # retrieve data
-  tab = values(data)
-  dom = domain(data)
+  tab = values(geotable)
+  dom = domain(geotable)
 
   # variables used for clustering
   dvars = Tables.schema(tab).names
@@ -43,9 +43,9 @@ function cluster(data::Data, method; vars=nothing)
   _cluster(georef(sel, dom), method)
 end
 
-function _cluster(data::Data, method::ClusteringMethod)
-  d = domain(data)
-  p = partition(data, method)
+function _cluster(geotable::AbstractGeoTable, method::ClusteringMethod)
+  d = domain(geotable)
+  p = partition(geotable, method)
 
   # assign cluster labels to samples
   labels = Vector{Int}(undef, nelements(d))
@@ -54,13 +54,13 @@ function _cluster(data::Data, method::ClusteringMethod)
   end
 
   # table with cluster labels
-  t = (cluster=categorical(labels),)
+  t = (; cluster=categorical(labels))
 
   georef(t, d)
 end
 
-function _cluster(data::Data, model::MI.Model)
-  table = values(data)
+function _cluster(geotable::AbstractGeoTable, model::MI.Model)
+  table = values(geotable)
 
   θ, _, __ = MI.fit(model, 0, table)
 
@@ -70,7 +70,7 @@ function _cluster(data::Data, model::MI.Model)
     MI.predict(model, θ, table)
   end
 
-  georef((cluster=cluster,), domain(data))
+  georef((; cluster), domain(geotable))
 end
 
 # ----------------

@@ -47,10 +47,10 @@ function GSC(k, m; σ=1.0, tol=1e-4, maxiter=10, weights=nothing)
   GSC(k, m, σ, tol, maxiter, weights)
 end
 
-function partitioninds(::AbstractRNG, data, method::GSC)
+function partitioninds(::AbstractRNG, geotable::AbstractGeoTable, method::GSC)
   # retrieve table and domain
-  𝒯 = values(data)
-  𝒟 = domain(data)
+  𝒯 = values(geotable)
+  𝒟 = domain(geotable)
 
   # retrieve parameters
   k = method.k

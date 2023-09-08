@@ -55,7 +55,7 @@ function GHC(k, λ; kern=:epanechnikov, link=:ward)
   GHC(k, λ, kern, link)
 end
 
-function partitioninds(::AbstractRNG, data, method::GHC)
+function partitioninds(::AbstractRNG, geotable::AbstractGeoTable, method::GHC)
   # GHC parameters
   k = method.k
   λ = method.λ
@@ -63,7 +63,7 @@ function partitioninds(::AbstractRNG, data, method::GHC)
   link = method.link
 
   # dissimilarity matrix
-  D = ghc_dissimilarity_matrix(data, kern, λ)
+  D = ghc_dissimilarity_matrix(geotable, kern, λ)
 
   # classical hierarchical clustering
   tree = hclust(D, linkage=link)
@@ -82,10 +82,10 @@ function partitioninds(::AbstractRNG, data, method::GHC)
   subsets, Dict()
 end
 
-function ghc_dissimilarity_matrix(data, kern, λ)
+function ghc_dissimilarity_matrix(geotable, kern, λ)
   # retrieve domain/table
-  𝒟 = domain(data)
-  𝒯 = values(data)
+  𝒟 = domain(geotable)
+  𝒯 = values(geotable)
 
   # kernel matrix
   K = ghc_kernel_matrix(kern, λ, 𝒟)
