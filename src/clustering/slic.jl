@@ -40,7 +40,7 @@ function SLIC(k::Int, m::Real; tol=1e-4, maxiter=10, weights=nothing)
   SLIC{typeof(weights)}(k, m, tol, maxiter, weights)
 end
 
-function partition(data, method::SLIC)
+function partitioninds(::AbstractRNG, data::AbstractGeoTable, method::SLIC)
   # retrieve parameters
   w = method.weights
   m = method.m
@@ -94,7 +94,7 @@ function partition(data, method::SLIC)
 
   subsets = [findall(isequal(k), l) for k in 1:length(c)]
 
-  Partition(data, subsets)
+  subsets, Dict()
 end
 
 slic_spacing(𝒟, method) = slic_srecursion(method.k, sides(boundingbox(𝒟)))
@@ -174,7 +174,7 @@ end
 
 function slic_update!(data, c, l)
   𝒟 = domain(data)
-  for k in 1:length(c)
+  for k in eachindex(c)
     inds = findall(isequal(k), l)
     X = (coordinates(centroid(𝒟, i)) for i in inds)
     xₖ = [mean(X)]
